@@ -1,0 +1,451 @@
+# Cairns — Implementation Spec
+
+> **Audience**: This document is the implementation spec for the Claude Code agent responsible for building and operating the Cairns system. Agent: read this fully, then begin with Phase 1.
+
+## System Purpose
+
+You manage a fully automated weekly Cairns program for a small software startup building software products. The team is all-in on agentic development with Claude Code and Beads. You handle topic intake, selection, research, presentation generation, and async delivery — no human review gate unless content touches sensitive internal data.
+
+All content lives in a single private GitHub repo, published via Cloudflare Pages with Cloudflare Access for team-only authentication. Each cairn is indexed into your QMD memory system as a searchable collection.
+
+## Security
+
+Apply LLM security protocols to all aspects of this system. You know what this means.
+
+## Architecture
+
+```
+#cairns (Slack) ←→ Natural language interaction
+        │
+        ▼
+  Claude Code Agent (Opus 4.6)
+        │
+        ├── Topic Queue (repo: queue.json)
+        ├── Research (web search, internal docs, repos)
+        ├── Generation
+        │     ├── Cairn module (primary deliverable)
+        │     ├── Nano Banana 2 (images/infographics)
+        │     └── Google Cloud TTS (Phase 3: narration)
+        │
+        ▼
+  GitHub Repo: {org}/cairns (private)
+        │
+        ├── presentations/YYYY-MM-DD-topic-slug/
+        │     ├── index.html          ← Cairn module
+        │     ├── research-brief.md   ← raw research notes
+        │     ├── assets/             ← generated images, SVGs, diagrams
+        │     ├── audio/              ← Phase 3: TTS narration per section
+        │     └── metadata.json       ← topic, submitter, date, tags, series info
+        │
+        ├── shared/
+        │     ├── tufte.css           ← Tufte CSS (vendored, MIT license)
+        │     ├── learn-module.css    ← thin extension layer
+        │     └── brand.css           ← team branding overrides
+        │
+        ├── templates/
+        │     └── module.html         ← base Cairn module template
+        │
+        ├── index.html                ← auto-generated taxonomy/archive
+        └── queue.json                ← current topic queue
+```
+
+## Hosting: Cloudflare Pages + Access
+
+The repo connects to Cloudflare Pages via GitHub integration. On every push to `main`, Cloudflare builds and deploys the static site automatically.
+
+**Cloudflare Access** gates the published site behind team authentication. Only authenticated team members can view presentations. This is a hard requirement — these cairns may reference internal architecture, product decisions, and team context that should not be publicly accessible.
+
+**Setup steps** (one-time):
+
+1. Create the `cairns` repo (private) in the org's GitHub.
+2. Connect the repo to Cloudflare Pages in the Cloudflare dashboard. Build command: none (static files, no build step). Output directory: `/` (repo root).
+3. Optionally configure a custom subdomain (e.g., `cairns.example.dev`) via Cloudflare DNS.
+4. In Cloudflare Zero Trust → Access → Applications, create a self-hosted application for the Pages domain.
+5. Add an Access policy: Allow → Emails ending in `@example.com` (or whatever the team domain is). Alternatively, enumerate specific email addresses or use an IdP group.
+6. **Important**: Also protect the `*.pages.dev` default domain, not just the custom domain, to prevent bypass via the auto-generated Cloudflare Pages URL. Enable Access protection in Pages → Settings, then verify both the root site and individual deployment URLs are gated.
+
+**QMD Integration**: After each cairn is published, index it into your QMD memory system as a collection entry — topic summary, key takeaways, tags, link, and sources. This makes past cairn content searchable and referenceable in future conversations. Over time, cross-linked modules form an emergent internal curriculum.
+
+## Interaction Model
+
+**No slash commands. Natural language only.**
+
+Team members interact with you in `#cairns` (or via DM) using plain English. You parse intent from conversational messages. Examples:
+
+- _"Hey, can you do a cairn on how our database query optimization works?"_ → Add to queue
+- _"What's in the queue?"_ → Show current queue
+- _"What's coming up this week?"_ → Show scheduled topic
+- _"Skip this week's topic and pick something else"_ → Re-select
+- _"Can you generate one right now on Cloudflare Workers?"_ → Immediate research + generate
+- _"Let's do a poll this week"_ → Post poll with top candidates
+- _"Anything interesting in the news this week for a topic?"_ → News-scan and suggest
+
+You also watch for 🎓 emoji reacts on messages in the channel — interpret the reacted message as a topic suggestion.
+
+When you receive a topic suggestion, confirm receipt and show where it landed in the queue. When you select a topic, announce it. When you publish, post the link and summary. Keep the channel informed at each stage without being noisy.
+
+## Workflow
+
+### 1. Topic Intake
+
+When a team member suggests a topic (conversationally or via 🎓 react), normalize it to:
+
+```json
+{
+  "id": "cairn-2026-03-18-001",
+  "title": "Zero-Knowledge Proofs in Construction Data",
+  "description": "How ZK proofs could apply to bid privacy and compliance verification",
+  "submitter": "alex",
+  "submitted_at": "2026-03-18T10:30:00Z",
+  "tags": ["ai", "security", "domain"],
+  "interest_score": 4,
+  "status": "queued"
+}
+```
+
+Tags should come from a controlled vocabulary: `ai`, `architecture`, `business`, `domain`, `devops`, `tools`, `science`, `news`, `culture`. Extend as needed but keep it tight.
+
+Maintain a pinned message in the channel showing the current queue, auto-updated on changes.
+
+### 2. Topic Selection (Monday morning)
+
+**Default: Auto Mode**. Select based on weighted scoring:
+
+| Factor | Weight | Logic |
+|---|---|---|
+| Team relevance | 30% | Current sprint themes, recent Slack activity, product roadmap context |
+| Queue age | 25% | Older topics get priority bumped — prevent starvation |
+| Topic diversity | 20% | Penalize back-to-back same-category topics |
+| Interest score | 15% | Your estimate of audience engagement |
+| Submitter rotation | 10% | Spread selection across submitters |
+
+**Poll mode** (on request): Post a Slack poll with top 3-4 candidates. Close next day. Winner gets produced.
+
+**Empty queue fallback** — auto-generate a topic from:
+
+1. Notable tech/industry news from the past week
+2. Deep dive on a team tool (Claude Code tips, Beads workflows, etc.)
+3. Industry developments
+4. Interesting science or engineering topic
+
+**Announce selection**: _"This week's Cairns: **[Topic]** — suggested by @alex. Dropping Thursday at noon."_
+
+### 3. Research Phase
+
+Perform deep research:
+
+- Web search across current sources, papers, blog posts, official docs
+- Internal context where relevant (repos, docs, Notion, prior cairns in your QMD memory)
+- Cross-reference multiple sources for accuracy and recency
+- Identify 2-3 key takeaways the team should walk away with
+
+Output: `research-brief.md` — structured notes with sources, committed to the presentation directory. This intermediate artifact has standalone value as a knowledge base entry even if presentation generation has issues.
+
+### 4. Content Generation: The Cairn module
+
+The primary deliverable is **not a slide deck**. It is a scrolling long-form learning module built on Tufte CSS — a high-readability, sidenote-rich, handout-style HTML document optimized for self-paced async consumption.
+
+This format was chosen over slide decks (reveal.js, Slidev, Marp) for several reasons:
+
+- **Natural agent output**: You produce continuous prose with embedded elements natively. Fighting slide-per-concept boundaries wastes effort and produces lower-density content.
+- **Better for async**: The team consumes these self-paced, not live-presented. Scrolling articles are superior for reading, scanning, ctrl+F, and bookmarking.
+- **Richer multimedia mixing**: Text, diagrams, code, images, sidenotes, and callouts coexist naturally in a scrolling layout. Slides force one-thing-per-view.
+- **Hypermedia linking**: Modules deep-link to each other via section anchors. Over time, this builds a cross-referenced knowledge base, not a pile of disconnected decks.
+- **Self-contained**: Each HTML file works with just CSS + CDN-loaded assets. No build step, no npm, no framework runtime.
+
+#### Content Model
+
+```
+Module
+├── metadata (title, part N of M, duration estimate, prerequisites)
+├── hero section (title, subtitle, key question or hook)
+├── sections[] (the meat)
+│     ├── heading + anchor ID
+│     ├── prose (explanation, context)
+│     ├── sidenotes[] (definitions, asides, "did you know")
+│     ├── figures[] (diagrams, images, Nano Banana 2 art)
+│     ├── callouts[] (key takeaway, warning, tip)
+│     └── deep_links[] (external references, further reading)
+├── summary section (key points, what's next)
+├── navigation (prev/next part, series TOC)
+└── references[] (hyperlinked bibliography)
+```
+
+#### Design Stack
+
+**Tufte CSS** (foundation layer):
+- MIT-licensed, CSS-only, zero JS runtime
+- Sidenotes for definitions, asides, glossary terms — perfect for learning content
+- Tight text-graphic integration as a first-class design primitive
+- Clean typography (ETBook font, Palatino/Georgia fallback)
+- Off-white background (#fffff8) for reduced eye strain
+- Semantic HTML structure: `<article>` → `<section>` → `<p>`, `<figure>`, `<aside>`
+- Source: https://github.com/edwardtufte/tufte-css (vendor into `shared/tufte.css`)
+
+**learn-module.css** (thin extension layer on top of Tufte CSS):
+- Callout boxes (key takeaway, warning, tip, definition) — colored left-border + light background
+- Series navigation bar (sticky or top/bottom)
+- Scroll progress indicator (CSS-only progress bar)
+- Responsive video embeds (`<iframe>` wrapper with aspect-ratio)
+- Code block styling via Prism or highlight.js
+- Print stylesheet that collapses sidenotes inline
+- `prefers-reduced-motion` media query to disable all animations
+- `prefers-color-scheme` dark mode support
+
+**brand.css** (branding overrides):
+- Team branding overrides for logo, color scheme, typography adjustments
+- Keeps branding separate from the Tufte foundation so updates don't collide
+
+**GSAP ScrollTrigger** (optional enhancement, use sparingly):
+- Section fade-in reveals on scroll
+- Occasional pinned diagrams for "focus moments"
+- CDN-loaded: two `<script>` tags, no build step
+- **Content must be fully readable with JS disabled** — GSAP is progressive enhancement only
+- Respect `prefers-reduced-motion` — disable all animations when set
+- Source: https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/
+
+#### HTML Structure
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Module Title — Cairns</title>
+  <link rel="stylesheet" href="../../shared/tufte.css"/>
+  <link rel="stylesheet" href="../../shared/learn-module.css"/>
+  <link rel="stylesheet" href="../../shared/brand.css"/>
+</head>
+<body>
+<article>
+  <header>
+    <h1>Module Title</h1>
+    <p class="subtitle">Part 2 of 4 · ~15 min read</p>
+    <nav class="series-nav">
+      <a href="../YYYY-MM-DD-part-1/">← Part 1: Foundations</a>
+      <a href="../YYYY-MM-DD-part-3/">Part 3: Advanced →</a>
+    </nav>
+  </header>
+
+  <section id="section-1">
+    <h2>Section Heading</h2>
+    <p><span class="newthought">Opening thought</span> in small caps,
+       Tufte style, leading into the concept...</p>
+
+    <figure>
+      <img src="assets/diagram.svg" alt="descriptive alt text"/>
+      <figcaption>Figure 1: Descriptive caption with context.</figcaption>
+    </figure>
+
+    <p>Explanatory prose continues here.
+      <label for="sn-1" class="margin-toggle sidenote-number"></label>
+      <input type="checkbox" id="sn-1" class="margin-toggle"/>
+      <span class="sidenote">Additional context, definition, or fun fact
+        that enriches without interrupting flow.</span>
+    </p>
+
+    <div class="callout callout-key">
+      <strong>Key Takeaway:</strong> The essential point from this section.
+    </div>
+  </section>
+
+  <section id="section-2">
+    <!-- next concept... -->
+  </section>
+
+  <section id="summary">
+    <h2>Summary</h2>
+    <ul>
+      <li>Key point 1</li>
+      <li>Key point 2</li>
+      <li>Key point 3</li>
+    </ul>
+  </section>
+
+  <section id="discussion">
+    <h2>Discussion Prompts</h2>
+    <!-- 2-3 questions to spark async thread conversation -->
+  </section>
+
+  <footer>
+    <h2>References & Further Reading</h2>
+    <ol>
+      <li><a href="...">Source Title</a> — brief annotation</li>
+    </ol>
+    <nav class="series-nav"><!-- repeat prev/next --></nav>
+  </footer>
+</article>
+
+<!-- Optional: GSAP for section reveals (progressive enhancement only) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gsap.registerPlugin(ScrollTrigger);
+    document.querySelectorAll('section').forEach(sec => {
+      gsap.from(sec, {
+        scrollTrigger: { trigger: sec, start: 'top 85%', once: true },
+        opacity: 0, y: 30, duration: 0.6
+      });
+    });
+  }
+</script>
+</body>
+</html>
+```
+
+#### Visual Assets: Nano Banana 2
+
+Generate 3-6 images/infographics per module:
+
+- Conceptual illustrations for abstract or non-technical topics
+- Infographics for data-heavy sections
+- Hero image for the opening
+- Use as full-width figures for key visuals, margin figures for supporting context
+- Store in `assets/`, reference with relative paths
+- Every image gets alt text and a `<figcaption>` — no exceptions
+
+#### Diagrams
+
+- Generate Mermaid diagrams and render to inline SVG where possible
+- For architecture and flow topics, diagrams should appear inline with the prose that discusses them — never in a separate "figures section"
+- Use Tufte's margin figures for small supporting visuals, full-width figures for key diagrams
+
+#### Content Structure
+
+Every cairn follows this arc:
+
+1. **Hero** — Title, subtitle, key question or hook. What this is and why it matters to us. (~1 section)
+2. **Background** — Just enough to level-set; assume smart people who may not know this domain. Use sidenotes for terminology. (~2-3 sections)
+3. **Core Content** — The substance, with diagrams, code, figures, and sidenotes. One concept per section. (~4-6 sections)
+4. **So What?** — How this connects to our work and toolchain. (~1 section)
+5. **Summary** — Key takeaways as a concise list.
+6. **Discussion Prompts** — 2-3 questions to spark async conversation in the Slack thread.
+7. **References** — Hyperlinked bibliography with brief annotations.
+
+#### Design Principles
+
+1. **Progressive disclosure over information dump.** Each section presents one concept. Sidenotes enrich; the main narrative flow must be complete without them.
+2. **Hypermedia as navigation.** Multi-part series are first-class. Modules link to prerequisites, next parts, and related modules via anchor IDs. This is how a curriculum emerges from individual cairns.
+3. **Visual-textual integration.** Figures appear inline with the prose that discusses them. Use margin figures for small visuals, full-width for key diagrams. Every figure needs a caption and alt text.
+4. **Accessible by default.** Semantic HTML, alt text on all images, color never the sole info channel, keyboard navigable, readable at 200% zoom, `prefers-reduced-motion` respected.
+5. **Self-contained artifacts.** Each HTML file works with just the shared CSS and CDN-loaded assets. No build step to view. SVGs inlined or co-located, fonts from CDN or bundled, GSAP from CDN.
+6. **Agent authoring constraints.** Write the content model as structured data first (JSON or markdown with frontmatter), then inject into the HTML template. Generate SVG diagrams inline. Keep GSAP optional — content must be fully readable with JS disabled. Produce valid semantic HTML.
+
+#### Multi-Part Series Strategy
+
+For subjects exceeding a single module:
+
+| Duration | Strategy |
+|---|---|
+| ≤15 min | Single module |
+| 15–30 min | Single module, 4-6 sections |
+| 30–60 min | 2-3 part series, each ≤20 min |
+| 60–120 min | 4-6 part series with curriculum overview index |
+| >120 min | Full course — index page + module groups + suggested learning path |
+
+Series index pages use the same Tufte template with a TOC layout: descriptions, estimated times, prerequisite indicators.
+
+### 5. Delivery (Thursday noon, async)
+
+Post to `#cairns`:
+
+- Link to the Cloudflare Pages module
+- TL;DR summary (3-4 sentences) inline in Slack
+- If multi-part: note which part this is and link the series index
+- Discussion thread auto-opens
+
+**Optional async section-by-section mode**: Post key sections one at a time into a Slack thread on a cadence. Each post includes the section summary/key takeaway + link to that section anchor in the full module. People engage in the thread as sections drop.
+
+### 6. Archive & Index
+
+**Auto-generated index page** (`index.html` at repo root):
+
+- Taxonomy by tag/category
+- Chronological listing (newest first)
+- Series groupings (show multi-part sets together)
+- Client-side search (Lunr.js or similar)
+- Each entry shows: title, date, submitter, tags, duration estimate, link
+- Regenerated on every push via GitHub Action
+
+**QMD memory**: After publication, index the cairn into your memory with topic summary, key takeaways, tags, module link (with section anchors for specific concepts), and source references.
+
+## Implementation Phases
+
+### Phase 1: Core Loop — Start Here
+
+**Goal**: You can take a topic, research it, generate a Cairn module with Nano Banana 2 visuals, commit to the repo, and have it auto-deploy to Cloudflare Pages behind Access. Then post the link and TL;DR to Slack.
+
+**Tasks in order**:
+
+1. Create the `cairns` repo with the directory structure documented above
+2. Vendor Tufte CSS into `shared/tufte.css`
+3. Build `shared/learn-module.css` — the extension layer (callouts, series nav, progress bar, code blocks, print styles, dark mode, reduced-motion)
+4. Build `shared/brand.css` — team branding overrides
+5. Build `templates/module.html` — the base Cairn module template with all the structure documented above. **This is the single most important artifact. Get it right before generating any content.**
+6. Set up Cloudflare Pages connected to the repo
+7. Configure Cloudflare Access to gate the site (team emails only). Verify both custom domain and `*.pages.dev` are protected.
+8. Implement the core generation pipeline: topic → research → `research-brief.md` → content model (structured data) → inject into template → Nano Banana 2 assets → commit → push
+9. Implement Slack posting: link + TL;DR to `#cairns`
+10. Build the index page generator (reads `metadata.json` files, produces `index.html`)
+11. Set up the GitHub Action for index regeneration on push
+12. Test end-to-end with a real topic
+
+**Not yet in Phase 1**: Queue management, auto-selection scheduling, polls, TTS, async drip, QMD integration, multi-part series, GSAP enhancements.
+
+### Phase 2: Automated Pipeline
+
+- Persistent topic queue (`queue.json` in repo)
+- Natural language topic intake from Slack (parsing suggestions, 🎓 reacts)
+- Auto-selection with weighted scoring (Monday morning)
+- Scheduled generation and delivery (Thursday noon)
+- Pinned queue message maintenance
+- QMD memory integration (index each published cairn)
+- Async section-by-section thread delivery option
+- Multi-part series support with linked index pages
+- GSAP ScrollTrigger enhancement (section fade-ins, pinned diagrams)
+
+### Phase 3: Audio Narration
+
+- **Google Cloud TTS**: Generate audio per section from the module prose. Embed as click-to-play controls per section. The free tier provides 1M WaveNet characters/month — each cairn uses ~15K characters, covering ~60+ modules/month at zero cost.
+- Feedback collection (Slack reacts → quality scoring → influences future topic selection)
+- Automated news-scan topic generation when queue runs thin
+- Quality iteration based on feedback patterns
+
+## GitHub Actions
+
+Simple workflow on push to `main`:
+
+1. Validate HTML (basic lint, accessibility check via axe-core if feasible)
+2. Regenerate `index.html` from `presentations/*/metadata.json`
+3. Cloudflare Pages auto-deploys from the GitHub integration (no explicit deploy step needed)
+
+## Cost Estimates
+
+| Service | Usage | Monthly Cost |
+|---|---|---|
+| Cloudflare Pages | Hosting + deploys | Free tier (500 builds/month) |
+| Cloudflare Access | Auth gating | Free for up to 50 users |
+| Nano Banana 2 | ~5 images/week | Per current API pricing |
+| Google Cloud TTS (Phase 3) | ~15K chars/week | Free (well within 1M WaveNet/month) |
+| Opus 4.6 | ~30-50K tokens/module | Part of existing API usage |
+
+## Content Safety Guardrails
+
+- If a topic might touch proprietary code, customer data, contract details, revenue figures, or trade secrets, flag it and ask a human before generating. This is the **only** case where a review gate applies.
+- Generated content should be educational and general enough that team-only access (via Cloudflare Access) is a reasonable protection level.
+- No customer names, bid amounts, or contract specifics in any cairn content.
+- Cite sources properly in the references section and research brief.
+
+## Reference Links
+
+| Resource | URL |
+|---|---|
+| Tufte CSS | https://edwardtufte.github.io/tufte-css/ |
+| Tufte CSS GitHub | https://github.com/edwardtufte/tufte-css |
+| GSAP ScrollTrigger | https://gsap.com/docs/v3/Plugins/ScrollTrigger/ |
+| GSAP CDN | https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ |
+| reveal.js (reference only) | https://revealjs.com/ |
+| The Pudding (exemplar) | https://pudding.cool/ |
+| ONS Scrollytelling Blog | https://digitalblog.ons.gov.uk/2021/06/02/how-we-build-scrollytelling-articles/ |

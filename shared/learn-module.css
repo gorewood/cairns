@@ -1,0 +1,887 @@
+/* ============================================================
+   Learn Module CSS — Extension layer for Pico CSS
+
+   "Cairns" dark academic journal aesthetic.
+   Single-column layout with right margin for sidenotes.
+   Inline TOC after header. No sidebar — keeps it simple.
+
+   Built on Pico's native font stack, dark mode, and variables.
+   ============================================================ */
+
+/* --- Custom Properties -------------------------------------------------- */
+:root {
+  /* Layout */
+  --lm-content-width: 680px;
+  --lm-margin-width: 250px;
+  --lm-margin-gap: 3rem;
+  --lm-total-width: calc(
+    var(--lm-content-width) + var(--lm-margin-width) + var(--lm-margin-gap)
+  );
+
+  /* Palette — dark academic journal */
+  --lm-bg: #0c0c14;
+  --lm-surface: #16161f;
+  --lm-surface-raised: #1a1a28;
+  --lm-text: #c8c8d4;
+  --lm-muted: #7a7a8a;
+  --lm-accent: #7c5cfc;
+  --lm-accent-hover: #9b82fc;
+  --lm-border: #1e1e2e;
+  --lm-border-strong: #2a2a3a;
+
+  /* Semantic colors */
+  --lm-callout-key: #4ade80;
+  --lm-callout-tip: #60a5fa;
+  --lm-callout-warn: #f5a623;
+  --lm-callout-def: #7c5cfc;
+
+  /* Typography */
+  --lm-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code',
+    monospace;
+  --lm-sans: system-ui, -apple-system, 'Segoe UI', 'Inter', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* --- Override Pico dark-mode tokens to match our palette ---------------- */
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  --pico-background-color: var(--lm-bg);
+  --pico-card-background-color: var(--lm-surface);
+  --pico-card-sectioning-background-color: var(--lm-surface-raised);
+  --pico-color: var(--lm-text);
+  --pico-muted-color: var(--lm-muted);
+  --pico-muted-border-color: var(--lm-border);
+  --pico-primary: var(--lm-accent);
+  --pico-primary-hover: var(--lm-accent-hover);
+  --pico-primary-background: var(--lm-accent);
+  --pico-primary-inverse: #fff;
+}
+
+/* --- Scroll Progress Bar ------------------------------------------------ */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--lm-accent);
+  z-index: 9999;
+  transition: width 80ms linear;
+  pointer-events: none;
+}
+
+/* ============================================================
+   ARTICLE LAYOUT
+   ============================================================ */
+article.learning-module {
+  max-width: var(--lm-total-width);
+  margin: 0 auto;
+  padding: 0 3rem 5rem;
+  counter-reset: sidenote-counter;
+  position: relative;
+  font-family: var(--lm-sans);
+  color: var(--lm-text);
+}
+
+@media (max-width: 1080px) {
+  article.learning-module {
+    max-width: calc(var(--lm-content-width) + 4rem);
+    padding: 0 1.5rem 4rem;
+  }
+}
+
+@media (max-width: 600px) {
+  article.learning-module {
+    padding: 0 1rem 3rem;
+  }
+}
+
+/* Constrain content elements to reading width */
+article.learning-module p,
+article.learning-module h1,
+article.learning-module h2,
+article.learning-module h3,
+article.learning-module h4,
+article.learning-module ul:not(.toc-list),
+article.learning-module ol:not(.toc-list),
+article.learning-module blockquote,
+article.learning-module pre,
+article.learning-module .callout,
+article.learning-module .scenario,
+article.learning-module .diagram-container,
+article.learning-module hr {
+  max-width: var(--lm-content-width);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+article.learning-module > header {
+  padding: 5rem 0 0;
+  margin-bottom: 0;
+  max-width: var(--lm-content-width);
+}
+
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lm-accent);
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+article.learning-module h1 {
+  font-size: 2.8rem;
+  line-height: 1.08;
+  margin: 0 0 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--lm-text);
+}
+
+/* --- Subtitle / byline ------------------------------------------------- */
+.subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  font-size: 0.82rem;
+  color: var(--lm-muted);
+  margin: 0 0 2rem;
+  padding: 0 0 2rem;
+  border-bottom: 1px solid var(--lm-border);
+  line-height: 1;
+}
+
+.subtitle span {
+  white-space: nowrap;
+}
+
+/* --- Lead paragraph ----------------------------------------------------- */
+.lead {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  margin: 0 0 2.5rem;
+  color: var(--lm-muted);
+  max-width: var(--lm-content-width);
+}
+
+/* ============================================================
+   INLINE TABLE OF CONTENTS
+   ============================================================ */
+.toc {
+  max-width: var(--lm-content-width);
+  margin: 0 0 3rem;
+  padding: 1.75rem 2rem;
+  background: var(--lm-surface);
+  border-radius: 10px;
+  border: 1px solid var(--lm-border);
+}
+
+.toc-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lm-muted);
+  margin-bottom: 1.25rem;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 2rem;
+}
+
+.toc-list li {
+  margin: 0;
+}
+
+.toc-list a {
+  display: block;
+  padding: 0.35rem 0;
+  color: var(--lm-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  transition: color 0.15s ease;
+}
+
+.toc-list a:hover {
+  color: var(--lm-accent);
+}
+
+@media (max-width: 600px) {
+  .toc-list {
+    grid-template-columns: 1fr;
+  }
+  .toc {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+article.learning-module {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+article.learning-module h2 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  margin: 4rem 0 1.25rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--lm-border-strong);
+  font-weight: 700;
+  color: var(--lm-text);
+}
+
+article.learning-module section:first-of-type h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+article.learning-module h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 2.5rem 0 0.75rem;
+  color: var(--lm-text);
+}
+
+article.learning-module h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--lm-muted);
+  margin: 2rem 0 0.5rem;
+}
+
+article.learning-module p {
+  margin: 1.1rem 0;
+}
+
+article.learning-module a {
+  color: var(--lm-accent);
+  text-decoration-color: rgba(124, 92, 252, 0.3);
+  text-underline-offset: 0.15em;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+
+article.learning-module a:hover {
+  color: var(--lm-accent-hover);
+  text-decoration-color: var(--lm-accent-hover);
+}
+
+.newthought {
+  font-variant: small-caps;
+  font-size: 1.05em;
+  letter-spacing: 0.01em;
+  font-weight: 500;
+}
+
+/* Strong / emphasis */
+article.learning-module strong {
+  color: #dcdce8;
+  font-weight: 700;
+}
+
+/* ============================================================
+   SIDENOTES & MARGIN NOTES
+   ============================================================ */
+label.sidenote-number {
+  counter-increment: sidenote-counter;
+  display: inline;
+  margin: 0;
+  padding: 0;
+  font-weight: inherit;
+  font-size: inherit;
+}
+
+label.sidenote-number::after {
+  content: counter(sidenote-counter);
+  font-size: 0.58rem;
+  position: relative;
+  top: -0.5rem;
+  left: 0.05rem;
+  color: var(--lm-accent);
+  font-weight: 700;
+}
+
+span.sidenote::before {
+  content: counter(sidenote-counter) ". ";
+  font-size: 0.72rem;
+  color: var(--lm-accent);
+  font-weight: 700;
+}
+
+.sidenote,
+.marginnote {
+  float: right;
+  clear: right;
+  width: var(--lm-margin-width);
+  margin-right: calc(-1 * (var(--lm-margin-width) + var(--lm-margin-gap)));
+  margin-top: 0.3rem;
+  margin-bottom: 2rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--lm-muted);
+}
+
+.marginnote::before {
+  content: none;
+}
+
+input.margin-toggle {
+  display: none;
+}
+
+label.margin-toggle:not(.sidenote-number) {
+  display: none;
+}
+
+/* Narrow screens: collapse sidenotes to toggleable inline blocks */
+@media (max-width: 1080px) {
+  .sidenote,
+  .marginnote {
+    display: none;
+    float: none;
+    width: 100%;
+    margin: 0.75rem 0 1.25rem;
+    padding: 0.85rem 1.1rem;
+    background: var(--lm-surface);
+    border-left: 2px solid var(--lm-accent);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.88rem;
+  }
+
+  .margin-toggle:checked + .sidenote,
+  .margin-toggle:checked + .marginnote {
+    display: block;
+  }
+
+  label.margin-toggle:not(.sidenote-number) {
+    display: inline;
+    cursor: pointer;
+    color: var(--lm-accent);
+  }
+
+  .sidenote-number {
+    cursor: pointer;
+  }
+}
+
+/* ============================================================
+   FIGURES
+   ============================================================ */
+article.learning-module figure {
+  margin: 2rem 0;
+  padding: 0;
+  max-width: var(--lm-content-width);
+}
+
+article.learning-module figure img,
+article.learning-module figure svg {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+article.learning-module figcaption {
+  font-size: 0.82rem;
+  color: var(--lm-muted);
+  margin-top: 0.6rem;
+  line-height: 1.5;
+}
+
+.fullwidth {
+  max-width: 100% !important;
+}
+
+.fullwidth img {
+  width: 100%;
+}
+
+.marginfigure {
+  float: right;
+  clear: right;
+  width: var(--lm-margin-width);
+  margin-right: calc(-1 * (var(--lm-margin-width) + var(--lm-margin-gap)));
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1080px) {
+  .marginfigure {
+    float: none;
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+}
+
+/* ============================================================
+   CALLOUT BOXES
+   ============================================================ */
+.callout {
+  padding: 1.5rem 1.75rem;
+  margin: 2rem 0;
+  border-left: 3px solid var(--lm-border-strong);
+  background: var(--lm-surface);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.callout p {
+  margin: 0.5rem 0;
+  max-width: none;
+}
+
+.callout p:first-of-type {
+  margin-top: 0;
+}
+
+.callout p:last-of-type {
+  margin-bottom: 0;
+}
+
+.callout-label {
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Variants */
+.callout-key {
+  border-left-color: var(--lm-callout-key);
+}
+
+.callout-key .callout-label {
+  color: var(--lm-callout-key);
+}
+
+.callout-tip {
+  border-left-color: var(--lm-callout-tip);
+}
+
+.callout-tip .callout-label {
+  color: var(--lm-callout-tip);
+}
+
+.callout-warn {
+  border-left-color: var(--lm-callout-warn);
+}
+
+.callout-warn .callout-label {
+  color: var(--lm-callout-warn);
+}
+
+.callout-def {
+  border-left-color: var(--lm-callout-def);
+}
+
+.callout-def .callout-label {
+  color: var(--lm-callout-def);
+}
+
+/* ============================================================
+   SCENARIO BLOCKS
+   ============================================================ */
+.scenario {
+  margin: 2rem 0;
+  padding: 1.75rem;
+  background: var(--lm-surface);
+  border-radius: 10px;
+  border: 1px solid var(--lm-border);
+}
+
+.scenario-header {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--lm-accent);
+  margin-bottom: 1rem;
+}
+
+.scenario p {
+  margin: 0.5rem 0;
+  max-width: none;
+}
+
+.scenario .slack-msg {
+  font-size: 0.88rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  background: var(--lm-bg);
+  border-radius: 8px;
+  border: 1px solid var(--lm-border);
+  line-height: 1.6;
+}
+
+.scenario .slack-msg .sender {
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
+
+.scenario .slack-msg .bot {
+  color: var(--lm-accent);
+}
+
+.scenario .slack-msg .human {
+  color: var(--lm-callout-tip);
+}
+
+.scenario .slack-msg .timestamp {
+  font-size: 0.72rem;
+  color: var(--lm-muted);
+  margin-left: 0.25rem;
+}
+
+/* ============================================================
+   CODE
+   ============================================================ */
+article.learning-module code {
+  font-family: var(--lm-mono);
+  font-size: 0.85em;
+  background: var(--lm-surface-raised);
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  color: var(--lm-text);
+}
+
+article.learning-module pre {
+  background: var(--lm-surface);
+  border: 1px solid var(--lm-border);
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+}
+
+article.learning-module pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* ============================================================
+   LISTS
+   ============================================================ */
+article.learning-module
+  ul:not(.toc-list):not(.discussion-prompts):not(.summary-list),
+article.learning-module
+  ol:not(.toc-list):not(.references):not(.summary-list) {
+  padding-left: 1.5rem;
+}
+
+article.learning-module li {
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================================
+   SERIES NAVIGATION
+   ============================================================ */
+.series-nav {
+  font-size: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--lm-border);
+  margin-top: 1.5rem;
+  max-width: var(--lm-content-width);
+}
+
+.series-nav a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--lm-accent);
+}
+
+.series-nav a:hover {
+  color: var(--lm-accent-hover);
+  text-decoration: underline;
+}
+
+.series-nav .disabled {
+  color: var(--lm-muted);
+  opacity: 0.4;
+}
+
+/* ============================================================
+   SUMMARY LIST
+   ============================================================ */
+.summary-list {
+  list-style: none;
+  padding: 0;
+  counter-reset: summary;
+}
+
+.summary-list li {
+  counter-increment: summary;
+  padding: 0.75rem 0 0.75rem 3rem;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.summary-list li::before {
+  content: counter(summary);
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lm-accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================
+   DISCUSSION PROMPTS
+   ============================================================ */
+.discussion-prompts {
+  list-style: none;
+  padding: 0;
+}
+
+.discussion-prompts li {
+  font-size: 1rem;
+  padding: 0.65rem 0 0.65rem 2.5rem;
+  position: relative;
+}
+
+.discussion-prompts li::before {
+  content: "\1F4AC";
+  position: absolute;
+  left: 0;
+  font-size: 1rem;
+}
+
+/* ============================================================
+   REFERENCES
+   ============================================================ */
+.references {
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.references li {
+  margin-bottom: 0.75rem;
+}
+
+.references .annotation {
+  color: var(--lm-muted);
+  font-size: 0.84rem;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+article.learning-module > footer {
+  margin-top: 4rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--lm-border-strong);
+  max-width: var(--lm-content-width);
+}
+
+article.learning-module footer h2 {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.colophon {
+  font-size: 0.75rem;
+  color: var(--lm-muted);
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--lm-border);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   DIAGRAMS
+   ============================================================ */
+.diagram-container {
+  margin: 2rem 0;
+}
+
+.diagram-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================================
+   SECTION REVEAL ANIMATION
+   ============================================================ */
+article.learning-module[data-animate] section {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+/* First section: no animation — always visible immediately */
+article.learning-module[data-animate] section:first-of-type {
+  opacity: 1;
+  transform: none;
+}
+
+article.learning-module[data-animate] section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fallback when JS is disabled */
+@media (scripting: none) {
+  article.learning-module[data-animate] section {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY — REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  .progress-bar {
+    transition: none !important;
+  }
+
+  section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  .progress-bar,
+  .toc,
+  .series-nav {
+    display: none !important;
+  }
+
+  article.learning-module {
+    max-width: none;
+    padding: 0;
+    font-size: 11pt;
+    color: #000;
+  }
+
+  article.learning-module h1,
+  article.learning-module h2,
+  article.learning-module h3 {
+    color: #000;
+  }
+
+  .sidenote,
+  .marginnote {
+    float: none;
+    display: block;
+    width: auto;
+    margin: 0.5rem 0 0.5rem 2rem;
+    font-size: 0.85em;
+    border-left: 1px solid #999;
+    padding-left: 0.5rem;
+    color: #555;
+  }
+
+  input.margin-toggle {
+    display: none;
+  }
+
+  .marginfigure {
+    float: none;
+    margin: 1rem 0;
+  }
+
+  h1 {
+    font-size: 22pt;
+  }
+
+  h2 {
+    page-break-after: avoid;
+  }
+
+  figure {
+    page-break-inside: avoid;
+  }
+
+  .callout,
+  .scenario {
+    break-inside: avoid;
+    border-color: #999;
+    background: #f5f5f5;
+  }
+
+  .hero-eyebrow,
+  .scenario-header {
+    color: #333;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE — NARROW SCREENS
+   ============================================================ */
+@media (max-width: 1080px) {
+  article.learning-module h1 {
+    font-size: 2.2rem;
+  }
+
+  article.learning-module h2 {
+    margin-top: 3rem;
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  article.learning-module h1 {
+    font-size: 1.8rem;
+    letter-spacing: -0.02em;
+  }
+
+  article.learning-module h2 {
+    font-size: 1.3rem;
+  }
+
+  .subtitle {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .callout,
+  .scenario {
+    padding: 1.25rem;
+  }
+
+  .scenario .slack-msg {
+    padding: 0.6rem 0.75rem;
+  }
+}
