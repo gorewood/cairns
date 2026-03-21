@@ -3,7 +3,7 @@ title: "The Quiet Teammate"
 subtitle: "How OpenClaw Fills the Gaps Nobody Notices Until It's Too Late"
 date: 2026-03-20
 tags: [ai, tools, devops, culture]
-submitter: Bob
+submitter: Agent
 duration: 15
 status: published
 lead: >
@@ -64,7 +64,7 @@ In a startup where the CEO is also doing sales calls and the architect is also d
 <div class="scenario">
 <div class="scenario-header">Example: Context that would otherwise get lost</div>
 <div class="slack-msg"><span class="sender human">@dana</span> (in #product) Just got off a call with Northwind Systems — they're asking about support for batch processing in the dashboard. Said it's a dealbreaker for their Q3 eval.</div>
-<div class="slack-msg"><span class="sender bot">@Q</span> (in #engineering, 2 min later) Heads up: Dana flagged batch processing as a dealbreaker for the Northwind Q3 evaluation. This may affect dashboard sprint planning. Relevant context: LIN-298 (batch processing) is currently in the icebox. cc @bob</div>
+<div class="slack-msg"><span class="sender bot">@Q</span> (in #engineering, 2 min later) Heads up: Dana flagged batch processing as a dealbreaker for the Northwind Q3 evaluation. This may affect dashboard sprint planning. Relevant context: LIN-298 (batch processing) is currently in the icebox. cc @alex</div>
 </div>
 
 The agent isn't making decisions here. It's routing signal. In a 50-person company, a product manager would do this. In a 6-person company, it falls through the cracks unless someone builds a habit around it — or an agent does.
@@ -124,7 +124,7 @@ Important product decisions happen in Slack threads and Zoom calls. They're effe
 
 <div class="scenario">
 <div class="scenario-header">Example: Decision logging</div>
-<div class="slack-msg"><span class="sender human">@bob</span> @Q log decision: We're going with PostGIS for spatial queries instead of building our own R-tree index. Reason: maintenance burden not justified at our scale. Revisit at 500K+ route segments.</div>
+<div class="slack-msg"><span class="sender human">@alex</span> @Q log decision: We're going with PostGIS for spatial queries instead of building our own R-tree index. Reason: maintenance burden not justified at our scale. Revisit at 500K+ route segments.</div>
 <div class="slack-msg"><span class="sender bot">@Q</span> Logged. Decision #47: PostGIS for spatial queries over custom R-tree. Revisit trigger: 500K+ route segments. Tagged: architecture, backend, database.</div>
 </div>
 
