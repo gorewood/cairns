@@ -146,7 +146,9 @@ graph LR
 - Keep diagrams focused — one concept per diagram
 - Use short, clear node labels
 - Prefer `graph LR` (left-to-right) for process flows, `graph TD` (top-down) for hierarchies
-- Diagrams auto-adapt to dark/light mode — no manual color overrides needed
+- Diagrams auto-adapt to dark/light mode and re-render on theme toggle
+- **Never use inline style directives** on nodes (e.g., `style A fill:#f00`) — they override the theme and break both modes
+- If you need node emphasis, use Mermaid's `:::className` syntax with custom CSS classes, or rely on the theme's primaryColor/secondaryColor differentiation
 - Test complex diagrams with `npm run serve` before publishing
 
 ## Standard Markdown

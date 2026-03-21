@@ -97,7 +97,7 @@
 }
 .article-header__lead {
   font-size: 1.15rem;
-  color: #a8a8b8;
+  color: var(--text-muted);
   line-height: 1.75;
 }
 .article-header__lead em { color: var(--text-bright); font-style: italic; }
@@ -433,6 +433,20 @@ pre.mermaid {
 pre.mermaid svg {
   max-width: 100%;
   height: auto;
+}
+/* Flowcharts/state diagrams: constrain width to avoid dominating the article */
+pre.mermaid:has(.flowchart) svg,
+pre.mermaid:has([id^="flowchart"]) svg,
+pre.mermaid:has(.statediagram) svg,
+pre.mermaid:has([id^="state"]) svg {
+  max-width: 75%;
+  margin: 0 auto;
+}
+/* Sequence diagrams: full width with minimum for readability */
+pre.mermaid:has(.sequenceDiagram) svg,
+pre.mermaid:has([id^="sequence"]) svg {
+  max-width: 100%;
+  min-width: 600px;
 }
 
 /* ── Trail Navigation ── */

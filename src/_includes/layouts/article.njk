@@ -182,23 +182,63 @@
   <noscript><style>.article-body[data-animate] section{opacity:1;transform:none;}</style></noscript>
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+    const MERMAID_THEMES = {
+      dark: {
+        primaryColor: '#2a2a4a', primaryTextColor: '#e8e8f0',
+        primaryBorderColor: '#7c5cfc', lineColor: '#6a6a7a',
+        secondaryColor: '#1a1a28', tertiaryColor: '#14141f',
+        noteBkgColor: '#2a2a4a', noteTextColor: '#e8e8f0',
+        signalTextColor: '#e8e8f0', messageFontColor: '#c0c0cc',
+        actorBkg: '#2a2a4a', actorTextColor: '#e8e8f0',
+        edgeLabelBackground: '#14141f', labelBoxBkgColor: '#2a2a4a',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      },
+      light: {
+        primaryColor: '#ddd8d0', primaryTextColor: '#1a1a2e',
+        primaryBorderColor: '#5a3fd4', lineColor: '#7a7a7a',
+        secondaryColor: '#f0f0eb', tertiaryColor: '#f5f5f0',
+        noteBkgColor: '#ddd8d0', noteTextColor: '#1a1a2e',
+        signalTextColor: '#1a1a2e', messageFontColor: '#3a3a3a',
+        actorBkg: '#ddd8d0', actorTextColor: '#1a1a2e',
+        edgeLabelBackground: '#f5f5f0', labelBoxBkgColor: '#ddd8d0',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }
+    };
+
+    function getTheme() {
+      return document.documentElement.getAttribute('data-theme') || 'dark';
+    }
+
+    // Store original diagram source before first render
+    const mermaidBlocks = document.querySelectorAll('pre.mermaid');
+    const originalSources = new Map();
+    mermaidBlocks.forEach(block => {
+      originalSources.set(block, block.textContent);
+    });
+
     mermaid.initialize({
       startOnLoad: true,
       theme: 'base',
-      themeVariables: theme === 'light' ? {
-        primaryColor: '#e8e4f8', primaryTextColor: '#1a1a1a',
-        primaryBorderColor: '#6340d4', lineColor: '#7a7a7a',
-        secondaryColor: '#f0f0eb', tertiaryColor: '#f5f5f0',
-        noteBkgColor: '#e8e4f8', noteTextColor: '#1a1a1a',
-        fontFamily: 'Inter, system-ui, sans-serif'
-      } : {
-        primaryColor: '#2a2440', primaryTextColor: '#c0c0cc',
-        primaryBorderColor: '#7c5cfc', lineColor: '#6a6a7a',
-        secondaryColor: '#1a1a28', tertiaryColor: '#14141f',
-        noteBkgColor: '#2a2440', noteTextColor: '#c0c0cc',
-        fontFamily: 'Inter, system-ui, sans-serif'
-      }
+      themeVariables: MERMAID_THEMES[getTheme()]
+    });
+
+    // Re-render diagrams on theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      setTimeout(async () => {
+        // Reset blocks to original source text
+        mermaidBlocks.forEach(block => {
+          block.removeAttribute('data-processed');
+          block.innerHTML = originalSources.get(block);
+        });
+        // Re-initialize with new theme and re-render
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'base',
+          themeVariables: MERMAID_THEMES[getTheme()]
+        });
+        await mermaid.run({ nodes: mermaidBlocks });
+      }, 50);
     });
   </script>
 </body>
