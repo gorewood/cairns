@@ -1,0 +1,436 @@
+/* ============================================================
+   ARTICLE PAGE STYLES — Cairns
+   ============================================================ */
+
+/* ── Scroll Progress Bar ── */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+/* ── Two-Column Grid Layout ── */
+.page-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 0;
+  gap: 2.5rem;
+}
+
+/* ── Left Sidebar TOC ── */
+.toc-sidebar {
+  position: sticky;
+  top: 2rem;
+  align-self: start;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+}
+.toc-sidebar__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+}
+.toc-sidebar__list {
+  list-style: none;
+}
+.toc-sidebar__list li {
+  margin-bottom: 0.1rem;
+}
+.toc-sidebar__list a {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.3rem 0 0.3rem 0.7rem;
+  border-left: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  line-height: 1.4;
+}
+.toc-sidebar__list a:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+.toc-sidebar__list a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+}
+
+/* ── Article Content Column ── */
+.article-content {
+  max-width: 720px;
+}
+
+/* ── Article Header ── */
+.article-header {
+  margin-bottom: 2.5rem;
+}
+.article-header__eyebrow {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+.article-header__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.2;
+  margin-bottom: 0.6rem;
+}
+.article-header__subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 1.4rem;
+  line-height: 1.5;
+}
+.article-header__lead {
+  font-size: 1.15rem;
+  color: #a8a8b8;
+  line-height: 1.75;
+}
+.article-header__lead em { color: var(--text-bright); font-style: italic; }
+
+/* ── Section Headings ── */
+.article-body section {
+  margin-bottom: 2.5rem;
+}
+.article-body section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  line-height: 1.3;
+  margin-bottom: 1rem;
+  padding-top: 4rem;
+}
+.article-body section:first-of-type h2 {
+  padding-top: 0;
+}
+.article-body section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-top: 1.8rem;
+  margin-bottom: 0.6rem;
+}
+
+/* ── Body Text ── */
+.article-body p {
+  font-size: 1rem;
+  line-height: 1.78;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+.article-body .newthought {
+  font-variant: small-caps;
+  font-weight: 700;
+  font-size: 1.08em;
+  letter-spacing: 0.02em;
+  color: var(--text-bright);
+}
+.article-body strong { color: var(--text-bright); }
+.article-body em { font-style: italic; }
+.article-body ul,
+.article-body ol {
+  margin-bottom: 1rem;
+  padding-left: 1.4rem;
+}
+.article-body li {
+  font-size: 1rem;
+  line-height: 1.78;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+.article-body code {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.12rem 0.4rem;
+  color: var(--text-bright);
+}
+.article-body pre {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+.article-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+/* ── Sidenotes (click-to-expand inline) ── */
+.sidenote-number {
+  cursor: pointer;
+  counter-increment: sidenote-counter;
+}
+.sidenote-number::after {
+  content: counter(sidenote-counter);
+  font-size: 0.6rem;
+  vertical-align: super;
+  color: var(--accent);
+  font-weight: 700;
+  margin-left: 1px;
+}
+.margin-toggle { display: none; }
+.sidenote {
+  display: none;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.margin-toggle:checked + .sidenote {
+  display: block;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+  padding: 0.8rem 1rem;
+  margin: 0.6rem 0 1rem;
+}
+.margin-toggle:checked + .sidenote::before {
+  content: counter(sidenote-counter) ". ";
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* ── Callout Boxes ── */
+.callout {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0 6px 6px 0;
+  padding: 1.5rem;
+  margin: 1.2rem 0 1.4rem;
+  border-left: 3px solid var(--accent);
+}
+.callout-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+.callout p {
+  margin-bottom: 0;
+}
+.callout-key { border-left-color: var(--green); }
+.callout-key .callout-label { color: var(--green); }
+.callout-tip { border-left-color: var(--blue); }
+.callout-tip .callout-label { color: var(--blue); }
+.callout-warn { border-left-color: var(--orange); }
+.callout-warn .callout-label { color: var(--orange); }
+.callout-def { border-left-color: var(--accent); }
+.callout-def .callout-label { color: var(--accent); }
+
+/* ── Scenario Blocks (Slack mockups) ── */
+.scenario {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem;
+  margin: 1.2rem 0 1.4rem;
+}
+.scenario-header {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+.slack-msg {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.slack-msg:last-child { margin-bottom: 0; }
+.slack-msg .sender {
+  font-weight: 700;
+  margin-right: 0.4rem;
+}
+.slack-msg .sender.bot { color: var(--accent); }
+.slack-msg .sender.human { color: var(--blue); }
+.slack-msg code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1rem 0.35rem;
+  color: var(--text-bright);
+}
+
+/* ── Summary List ── */
+.summary-list {
+  list-style: none;
+  padding-left: 0;
+  counter-reset: summary-counter;
+}
+.summary-list li {
+  counter-increment: summary-counter;
+  padding-left: 2.4rem;
+  position: relative;
+  margin-bottom: 0.7rem;
+}
+.summary-list li::before {
+  content: counter(summary-counter);
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Discussion Prompts ── */
+.discussion-prompts {
+  list-style: none;
+  padding-left: 0;
+}
+.discussion-prompts li {
+  padding-left: 1.8rem;
+  position: relative;
+  margin-bottom: 0.7rem;
+}
+.discussion-prompts li::before {
+  content: "\1F4AC";
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1rem;
+}
+
+/* ── References ── */
+.references {
+  padding-left: 1.4rem;
+}
+.references li {
+  margin-bottom: 0.5rem;
+}
+.references .annotation {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Article Footer / Colophon ── */
+.colophon {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* ── Section Reveal Animation ── */
+.article-body[data-animate] section {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.article-body[data-animate] section.visible {
+  opacity: 1;
+  transform: none;
+}
+.article-body[data-animate] section:first-of-type {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Accessibility: Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar { transition: none; }
+  .article-body[data-animate] section {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ── Print Styles ── */
+@media print {
+  :root {
+    --bg: #fff;
+    --bg-card: #f8f8f8;
+    --bg-card-alt: #f4f4f4;
+    --border: #ddd;
+    --border-light: #ccc;
+    --text: #222;
+    --text-muted: #666;
+    --text-bright: #000;
+    --accent: #5a3fd4;
+  }
+  .progress-bar,
+  .toc-sidebar { display: none; }
+  body { font-size: 12pt; }
+  .page-grid {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+  }
+  .article-content { max-width: 100%; }
+  .sidenote {
+    display: block !important;
+    float: none !important;
+    width: auto !important;
+    margin: 0.5rem 0 0.5rem 1.5rem !important;
+    padding: 0.5rem;
+    background: #f5f5f5;
+    border-left: 2px solid #999;
+    font-size: 0.85rem;
+  }
+  .sidenote::before {
+    content: "Note " counter(sidenote-counter) ": ";
+    font-weight: 700;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 999px) {
+  .toc-sidebar { display: none; }
+  .page-grid {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.5rem 0;
+  }
+  .article-header__title { font-size: 2rem; }
+}
+@media (max-width: 600px) {
+  .page-grid { padding: 1.5rem 1rem 0; }
+  .article-header__title { font-size: 1.6rem; }
+  .article-header__lead { font-size: 1.05rem; }
+}

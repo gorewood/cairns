@@ -1,0 +1,111 @@
+const markdownIt = require("markdown-it");
+const markdownItAnchor = require("markdown-it-anchor");
+const markdownItContainer = require("markdown-it-container");
+
+module.exports = function (eleventyConfig) {
+  // --- Markdown-it with custom containers ---
+  const md = markdownIt({ html: true, linkify: true, typographer: true });
+
+  // Heading anchors (auto-generates IDs for TOC)
+  md.use(markdownItAnchor, {
+    slugify: (s) =>
+      s.toLowerCase().replace(/[^\w]+/g, "-").replace(/(^-|-$)/g, ""),
+    permalink: false,
+  });
+
+  // ::: callout key / tip / warn / def
+  md.use(markdownItContainer, "callout", {
+    validate(params) {
+      return params.trim().match(/^callout\s+(key|tip|warn|def)$/);
+    },
+    render(tokens, idx) {
+      const m = tokens[idx].info.trim().match(/^callout\s+(key|tip|warn|def)$/);
+      if (tokens[idx].nesting === 1) {
+        const labels = { key: "Key Takeaway", tip: "Tip", warn: "Warning", def: "Definition" };
+        return `<div class="callout callout-${m[1]}">\n<span class="callout-label">${labels[m[1]]}</span>\n`;
+      }
+      return "</div>\n";
+    },
+  });
+
+  // ::: scenario "Title"
+  md.use(markdownItContainer, "scenario", {
+    validate(params) {
+      return params.trim().match(/^scenario\s+/);
+    },
+    render(tokens, idx) {
+      const m = tokens[idx].info.trim().match(/^scenario\s+"?(.+?)"?$/);
+      if (tokens[idx].nesting === 1) {
+        return `<div class="scenario">\n<div class="scenario-header">${md.utils.escapeHtml(m[1])}</div>\n`;
+      }
+      return "</div>\n";
+    },
+  });
+
+  // ::: newthought
+  md.use(markdownItContainer, "newthought", {
+    validate(params) {
+      return params.trim() === "newthought";
+    },
+    render(tokens, idx) {
+      if (tokens[idx].nesting === 1) {
+        return '<span class="newthought">';
+      }
+      return "</span>";
+    },
+  });
+
+  // ::: slack-msg bot|human "Name"
+  md.use(markdownItContainer, "slack-msg", {
+    validate(params) {
+      return params.trim().match(/^slack-msg\s+/);
+    },
+    render(tokens, idx) {
+      const m = tokens[idx].info.trim().match(/^slack-msg\s+(bot|human)\s+"?(.+?)"?$/);
+      if (tokens[idx].nesting === 1) {
+        const type = m[1];
+        const name = md.utils.escapeHtml(m[2]);
+        return `<div class="slack-msg"><span class="sender ${type}">${name}</span> `;
+      }
+      return "</div>\n";
+    },
+  });
+
+  eleventyConfig.setLibrary("md", md);
+
+  // --- Passthrough copy ---
+  eleventyConfig.addPassthroughCopy({ "src/_includes/css": "css" });
+
+  // --- Collections ---
+  eleventyConfig.addCollection("articles", function (collectionApi) {
+    return collectionApi
+      .getFilteredByGlob("src/articles/**/*.md")
+      .sort((a, b) => b.date - a.date);
+  });
+
+  // --- Filters ---
+  eleventyConfig.addFilter("dateFormat", function (date) {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+  });
+
+  eleventyConfig.addFilter("isoDate", function (date) {
+    return new Date(date).toISOString();
+  });
+};
+
+module.exports.config = {
+  dir: {
+    input: "src",
+    includes: "_includes",
+    data: "_data",
+    output: "_site",
+  },
+  templateFormats: ["md", "njk", "html"],
+  markdownTemplateEngine: "njk",
+  htmlTemplateEngine: "njk",
+};
