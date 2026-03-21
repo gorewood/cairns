@@ -117,6 +117,38 @@ Annotated bibliography:
 - Prefer primary sources over aggregator summaries
 - Verify links are accessible
 
+## Mermaid Diagrams
+
+Use fenced code blocks with the `mermaid` language hint. They render as interactive SVG diagrams with theme-aware colors.
+
+````markdown
+```mermaid
+graph LR
+    A[Research] --> B[Outline]
+    B --> C[Draft]
+    C --> D[Build]
+    D --> E[Publish]
+```
+````
+
+### Supported Diagram Types
+
+- `graph` / `flowchart` — process flows, decision trees
+- `sequenceDiagram` — interaction sequences between actors
+- `classDiagram` — entity relationships
+- `stateDiagram-v2` — state machines
+- `gantt` — timelines and schedules
+- `pie` — proportional data
+- `mindmap` — topic hierarchies
+
+### Guidelines
+
+- Keep diagrams focused — one concept per diagram
+- Use short, clear node labels
+- Prefer `graph LR` (left-to-right) for process flows, `graph TD` (top-down) for hierarchies
+- Diagrams auto-adapt to dark/light mode — no manual color overrides needed
+- Test complex diagrams with `npm run serve` before publishing
+
 ## Standard Markdown
 
 All standard markdown works: headings, bold, italic, lists, links, code blocks, images, blockquotes, horizontal rules, tables.

@@ -71,6 +71,16 @@ module.exports = function (eleventyConfig) {
     },
   });
 
+  // ```mermaid fenced blocks → <pre class="mermaid">
+  const defaultFence = md.renderer.rules.fence;
+  md.renderer.rules.fence = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    if (token.info.trim() === "mermaid") {
+      return `<pre class="mermaid">${md.utils.escapeHtml(token.content)}</pre>\n`;
+    }
+    return defaultFence(tokens, idx, options, env, self);
+  };
+
   eleventyConfig.setLibrary("md", md);
 
   // --- Passthrough copy ---

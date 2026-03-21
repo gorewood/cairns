@@ -180,5 +180,26 @@
     }
   </script>
   <noscript><style>.article-body[data-animate] section{opacity:1;transform:none;}</style></noscript>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: theme === 'light' ? {
+        primaryColor: '#e8e4f8', primaryTextColor: '#1a1a1a',
+        primaryBorderColor: '#6340d4', lineColor: '#7a7a7a',
+        secondaryColor: '#f0f0eb', tertiaryColor: '#f5f5f0',
+        noteBkgColor: '#e8e4f8', noteTextColor: '#1a1a1a',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      } : {
+        primaryColor: '#2a2440', primaryTextColor: '#c0c0cc',
+        primaryBorderColor: '#7c5cfc', lineColor: '#6a6a7a',
+        secondaryColor: '#1a1a28', tertiaryColor: '#14141f',
+        noteBkgColor: '#2a2440', noteTextColor: '#c0c0cc',
+        fontFamily: 'Inter, system-ui, sans-serif'
+      }
+    });
+  </script>
 </body>
 </html>

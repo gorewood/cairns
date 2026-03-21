@@ -420,6 +420,21 @@
   }
 }
 
+/* ── Mermaid Diagrams ── */
+pre.mermaid {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  overflow-x: auto;
+}
+pre.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ── Trail Navigation ── */
 .trail-nav {
   margin-top: 2.5rem;

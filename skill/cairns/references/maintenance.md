@@ -2,15 +2,16 @@
 
 Run these periodically to keep the knowledge base healthy and well-connected.
 
-## Weekly: After Publishing
+## After Publishing
 
 After each new cairn is published:
 
 1. **Cross-link check** — Does the new cairn relate to existing cairns? Add `related` slugs to both the new and existing articles' frontmatter.
 2. **Tag review** — Are the tags on the new cairn consistent with how those tags are used elsewhere? Check `grep -rh "^tags:" src/articles/`.
-3. **Build verify** — Run `npm run build` and check that Pagefind indexes the new content.
+3. **Memory index** — If you have a memory system, index the new cairn: title, subtitle, tags, key takeaways, permalink, and sources.
+4. **Build verify** — Run `npm run build` and check that Pagefind indexes the new content.
 
-## Monthly: Knowledge Base Health
+## Weekly: Knowledge Base Health
 
 ### Tag Cleanup
 
@@ -116,11 +117,20 @@ openclaw cron add --name "Weekly cairn" \
   --announce --channel slack --to "channel:CAIRNS_CHANNEL_ID"
 ```
 
-### Monthly maintenance pass (first Monday)
+### Weekly maintenance (Friday afternoon)
 ```bash
 openclaw cron add --name "Cairns maintenance" \
-  --cron "0 10 1-7 * 1" --tz "America/Los_Angeles" \
+  --cron "0 14 * * 5" --tz "America/Los_Angeles" \
   --session isolated \
-  --message "Run the monthly cairns maintenance: tag cleanup, cross-link audit, content freshness check, orphan detection, and trail continuity verification. Report findings and make fixes." \
+  --message "Run weekly cairns maintenance: tag cleanup, cross-link audit, orphan detection, trail continuity check. Index any new content into memory. Report findings and push fixes." \
+  --announce --channel slack --to "channel:CAIRNS_CHANNEL_ID"
+```
+
+### Mid-week engagement check (Tuesday morning)
+```bash
+openclaw cron add --name "Cairns engagement" \
+  --cron "0 10 * * 2" --tz "America/Los_Angeles" \
+  --session isolated \
+  --message "Check if this week's cairn topic has been decided. If not, scan recent team activity for relevant topics and suggest 2-3 candidates. If a topic is set, begin early research." \
   --announce --channel slack --to "channel:CAIRNS_CHANNEL_ID"
 ```
