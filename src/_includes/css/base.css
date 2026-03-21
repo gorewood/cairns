@@ -160,11 +160,14 @@ a:hover { text-decoration: underline; }
   gap: 2.5rem;
 }
 .footer-links__group .label { margin-bottom: 0.35rem; }
+.footer-links__group {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+}
 .footer-links__group a {
-  display: block;
   font-size: 0.75rem;
   color: var(--text-muted);
-  padding: 0.12rem 0;
   text-decoration: none;
 }
 .footer-links__group a:hover { color: var(--text); }

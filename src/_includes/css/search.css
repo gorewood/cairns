@@ -4,6 +4,9 @@
    ============================================================ */
 
 /* Container */
+#search {
+  margin-bottom: 1.2rem;
+}
 .pagefind-ui {
   --pagefind-ui-scale: 0.85;
   --pagefind-ui-primary: var(--accent);
