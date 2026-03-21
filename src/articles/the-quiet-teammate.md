@@ -12,7 +12,6 @@ lead: >
   that age. Standups nobody writes. Context that lives in one person's head.
   OpenClaw doesn't replace anyone on the team. It picks up the balls rolling
   toward the gutter.
-layout: layouts/article.njk
 permalink: /articles/the-quiet-teammate/
 ---
 

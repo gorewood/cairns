@@ -1,0 +1,70 @@
+---
+layout: layouts/base.njk
+pageCss: index.css
+pagination:
+  data: collections
+  size: 1
+  alias: tag
+  filter:
+    - all
+    - articles
+    - tagList
+permalink: /tags/{{ tag }}/
+eleventyComputed:
+  title: "Tag: {{ tag | tagDisplay }}"
+---
+<div class="layout">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar-left">
+    <p class="label">All Topics</p>
+    <ul class="cat-list">
+      {% for t in collections.tagList %}
+      <li><a href="/tags/{{ t }}/"{% if t == tag %} class="active"{% endif %}>{{ t | tagDisplay }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <p class="label label--accent">Topic</p>
+    <h1 style="font-size:1.8rem;font-weight:700;color:var(--text-bright);margin-bottom:0.4rem;">{{ tag | tagDisplay }}</h1>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">{{ collections[tag] | length }} {% if collections[tag] | length == 1 %}cairn{% else %}cairns{% endif %} tagged "{{ tag }}"</p>
+
+    {% for article in collections[tag] | reverse %}
+    <div class="entry">
+      <div class="entry__head">
+        <div class="entry__body">
+          <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
+          <p class="entry__desc">{{ article.data.subtitle }}</p>
+          <div class="entry__meta">
+            <span>{{ article.data.date | dateFormat }}</span>
+            <span>{{ article.data.duration }} min</span>
+            <span>{{ article.data.submitter }}</span>
+          </div>
+        </div>
+        <div class="entry__aside">
+          {% set topicTags = article.data.tags | reject("equalto", "articles") | reject("equalto", tag) %}
+          {% for t in topicTags %}
+          <a href="/tags/{{ t }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ t }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <p style="margin-top:2rem;"><a href="/library/">&larr; Back to Library</a></p>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="sidebar-right">
+    <p class="label">Statistics</p>
+    <dl class="meta-table">
+      <dt>In this topic</dt>
+      <dd>{{ collections[tag] | length }}</dd>
+      <dt>Total Cairns</dt>
+      <dd>{{ collections.articles | length }}</dd>
+    </dl>
+  </aside>
+
+</div>

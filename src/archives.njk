@@ -1,0 +1,71 @@
+---
+layout: layouts/base.njk
+title: Archives
+pageCss: index.css
+permalink: /archives/
+---
+<div class="layout">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar-left">
+    <p class="label">Categories</p>
+    <p class="sublabel">Knowledge Trails</p>
+    <ul class="cat-list">
+      {% for tag in collections.tagList %}
+      <li><a href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <p class="label label--accent">Archives</p>
+    <h1 style="font-size:1.8rem;font-weight:700;color:var(--text-bright);margin-bottom:0.4rem;">All Cairns</h1>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">Complete chronological listing, newest first.</p>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search cairns..." aria-label="Search cairns"/>
+    </div>
+
+    {% set sorted = collections.articles | reverse %}
+    {% for article in sorted %}
+    <div class="entry">
+      <div class="entry__head">
+        <div class="entry__body">
+          {% set topicTags = article.data.tags | reject("equalto", "articles") %}
+          {% if topicTags | length %}
+          <span class="entry__cat">{{ topicTags | first | tagDisplay }}</span>
+          {% endif %}
+          <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
+          <p class="entry__desc">{{ article.data.subtitle }}</p>
+          <div class="entry__meta">
+            <span>{{ article.data.date | dateFormat }}</span>
+            <span>{{ article.data.duration }} min</span>
+            <span>{{ article.data.submitter }}</span>
+          </div>
+        </div>
+        <div class="entry__aside">
+          {% for tag in topicTags %}
+          <a href="/tags/{{ tag }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ tag }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="sidebar-right">
+    <p class="label">Statistics</p>
+    <dl class="meta-table">
+      <dt>Total Cairns</dt>
+      <dd>{{ collections.articles | length }}</dd>
+      <dt>Topics</dt>
+      <dd>{{ collections.tagList | length }}</dd>
+    </dl>
+  </aside>
+
+</div>

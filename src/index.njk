@@ -10,16 +10,8 @@ pageCss: index.css
     <p class="label">Categories</p>
     <p class="sublabel">Knowledge Trails</p>
     <ul class="cat-list">
-      {% set allTags = [] %}
-      {% for article in collections.articles %}
-        {% for tag in article.data.tags %}
-          {% if tag not in allTags %}
-            {% set allTags = (allTags.push(tag), allTags) %}
-          {% endif %}
-        {% endfor %}
-      {% endfor %}
-      {% for tag in allTags %}
-      <li><a href="#">{{ tag | capitalize }}</a></li>
+      {% for tag in collections.tagList %}
+      <li><a href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a></li>
       {% endfor %}
     </ul>
   </aside>
@@ -27,7 +19,8 @@ pageCss: index.css
   <!-- Main Content -->
   <main class="main-content">
 
-    {% set featured = collections.articles | first %}
+    {% set sorted = collections.articles | reverse %}
+    {% set featured = sorted | first %}
     {% if featured %}
     <!-- Featured Selection -->
     <p class="label label--accent">Latest Cairn</p>
@@ -55,18 +48,19 @@ pageCss: index.css
       <input type="text" placeholder="Search cairns, topics, contributors..." aria-label="Search cairns"/>
     </div>
     <div class="tag-pills">
-      {% for tag in allTags %}
-      <button class="tag-pill">{{ tag | capitalize }}</button>
+      {% for tag in collections.tagList %}
+      <a class="tag-pill" href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a>
       {% endfor %}
     </div>
 
     <!-- Article Entries -->
-    {% for article in collections.articles %}
+    {% for article in sorted %}
     <div class="entry{% if loop.first %} entry--featured{% endif %}">
       <div class="entry__head">
         <div class="entry__body">
-          {% if article.data.tags[0] %}
-          <span class="entry__cat">{{ article.data.tags[0] | capitalize }}</span>
+          {% set topicTags = article.data.tags | reject("equalto", "articles") %}
+          {% if topicTags | length %}
+          <span class="entry__cat">{{ topicTags | first | tagDisplay }}</span>
           {% endif %}
           <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
           <p class="entry__desc">{{ article.data.subtitle }}</p>
@@ -103,11 +97,10 @@ pageCss: index.css
     <p class="label">Metadata</p>
     <dl class="meta-table">
       <dt>Articles</dt>
-      <dd>{{ collections.articles.length }}</dd>
+      <dd>{{ collections.articles | length }}</dd>
       <dt>Status</dt>
       <dd>NOMINAL</dd>
     </dl>
   </aside>
 
 </div>
-

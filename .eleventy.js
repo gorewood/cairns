@@ -77,13 +77,27 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/_includes/css": "css" });
 
   // --- Collections ---
-  eleventyConfig.addCollection("articles", function (collectionApi) {
-    return collectionApi
-      .getFilteredByGlob("src/articles/**/*.md")
-      .sort((a, b) => b.date - a.date);
+  // "articles" tag is applied by src/articles/articles.json
+  // Additional topic tags (ai, tools, etc.) create per-tag collections automatically
+
+  // All unique tags (excluding "articles")
+  eleventyConfig.addCollection("tagList", function (collectionApi) {
+    const tagSet = new Set();
+    collectionApi.getAll().forEach((item) => {
+      (item.data.tags || []).forEach((tag) => {
+        if (tag !== "articles") tagSet.add(tag);
+      });
+    });
+    return [...tagSet].sort();
   });
 
   // --- Filters ---
+  // Tag display: uppercase short tags (ai, devops), title-case others
+  const SHORT_TAGS = { ai: "AI", devops: "DevOps", api: "API", css: "CSS", ui: "UI", ux: "UX" };
+  eleventyConfig.addFilter("tagDisplay", function (tag) {
+    return SHORT_TAGS[tag] || tag.charAt(0).toUpperCase() + tag.slice(1);
+  });
+
   eleventyConfig.addFilter("dateFormat", function (date) {
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",

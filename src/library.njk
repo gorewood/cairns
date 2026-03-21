@@ -1,0 +1,63 @@
+---
+layout: layouts/base.njk
+title: Library
+pageCss: index.css
+permalink: /library/
+---
+<div class="layout">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar-left">
+    <p class="label">Topics</p>
+    <p class="sublabel">Browse by Tag</p>
+    <ul class="cat-list">
+      {% for tag in collections.tagList %}
+      <li><a href="#tag-{{ tag }}">{{ tag | tagDisplay }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <p class="label label--accent">Library</p>
+    <h1 style="font-size:1.8rem;font-weight:700;color:var(--text-bright);margin-bottom:0.4rem;">Knowledge by Topic</h1>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">All cairns organized by topic. Each article may appear under multiple tags.</p>
+
+    {% for tag in collections.tagList %}
+    <div id="tag-{{ tag }}" style="margin-bottom:2.5rem;">
+      <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-bright);margin-bottom:0.8rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+        <a href="/tags/{{ tag }}/" style="color:var(--accent);text-decoration:none;">{{ tag | tagDisplay }}</a>
+        <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;margin-left:0.5rem;">{{ collections[tag] | length }} {% if collections[tag] | length == 1 %}cairn{% else %}cairns{% endif %}</span>
+      </h2>
+      {% for article in collections[tag] | reverse %}
+      <div class="entry">
+        <div class="entry__head">
+          <div class="entry__body">
+            <h3 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+            <p class="entry__desc">{{ article.data.subtitle }}</p>
+            <div class="entry__meta">
+              <span>{{ article.data.date | dateFormat }}</span>
+              <span>{{ article.data.duration }} min</span>
+              <span>{{ article.data.submitter }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="sidebar-right">
+    <p class="label">Statistics</p>
+    <dl class="meta-table">
+      <dt>Total Cairns</dt>
+      <dd>{{ collections.articles | length }}</dd>
+      <dt>Topics</dt>
+      <dd>{{ collections.tagList | length }}</dd>
+    </dl>
+  </aside>
+
+</div>
