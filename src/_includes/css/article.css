@@ -420,6 +420,63 @@
   }
 }
 
+/* ── Trail Navigation ── */
+.trail-nav {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+.trail-nav__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.trail-nav__position {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.trail-nav__links {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.trail-nav__link {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+.trail-nav__link:hover { text-decoration: underline; }
+.trail-nav__disabled {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+.trail-nav__next { text-align: right; }
+
+/* ── Related Cairns ── */
+.related-cairns {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.related-cairns ul {
+  list-style: none;
+  padding: 0;
+}
+.related-cairns li {
+  padding: 0.4rem 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.related-cairns li a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
 /* ── Responsive ── */
 @media (max-width: 999px) {
   .toc-sidebar { display: none; }

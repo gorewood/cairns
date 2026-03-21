@@ -91,7 +91,28 @@ module.exports = function (eleventyConfig) {
     return [...tagSet].sort();
   });
 
+  // Trails: group articles by trail name, sorted by trailOrder
+  eleventyConfig.addCollection("trails", function (collectionApi) {
+    const trails = {};
+    collectionApi.getFilteredByTag("articles").forEach((item) => {
+      const trail = item.data.trail;
+      if (!trail) return;
+      if (!trails[trail]) trails[trail] = [];
+      trails[trail].push(item);
+    });
+    // Sort each trail by order
+    for (const name of Object.keys(trails)) {
+      trails[name].sort((a, b) => (a.data.trailOrder || 0) - (b.data.trailOrder || 0));
+    }
+    return trails;
+  });
+
   // --- Filters ---
+
+  // Find related articles by slug list
+  eleventyConfig.addFilter("findBySlug", function (collection, slug) {
+    return collection.find((item) => item.fileSlug === slug);
+  });
   // Tag display: uppercase short tags (ai, devops), title-case others
   const SHORT_TAGS = { ai: "AI", devops: "DevOps", api: "API", css: "CSS", ui: "UI", ux: "UX" };
   eleventyConfig.addFilter("tagDisplay", function (tag) {
