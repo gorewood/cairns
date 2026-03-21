@@ -2,8 +2,9 @@
 layout: layouts/base.njk
 title: Trailhead
 pageCss: index.css
+search: true
 ---
-<div class="layout">
+<div class="layout" data-pagefind-ignore="all">
 
   <!-- Left Sidebar -->
   <aside class="sidebar-left">
@@ -42,11 +43,8 @@ pageCss: index.css
     </div>
     {% endif %}
 
-    <!-- Search + Tags -->
-    <div class="search-bar">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search cairns, topics, contributors..." aria-label="Search cairns"/>
-    </div>
+    <!-- Search -->
+    <div id="search" data-pagefind-ignore></div>
     <div class="tag-pills">
       {% for tag in collections.tagList %}
       <a class="tag-pill" href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a>

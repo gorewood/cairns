@@ -2,9 +2,10 @@
 layout: layouts/base.njk
 title: Archives
 pageCss: index.css
+search: true
 permalink: /archives/
 ---
-<div class="layout">
+<div class="layout" data-pagefind-ignore="all">
 
   <!-- Left Sidebar -->
   <aside class="sidebar-left">
@@ -24,10 +25,7 @@ permalink: /archives/
     <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">Complete chronological listing, newest first.</p>
 
     <!-- Search -->
-    <div class="search-bar">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" placeholder="Search cairns..." aria-label="Search cairns"/>
-    </div>
+    <div id="search" data-pagefind-ignore></div>
 
     {% set sorted = collections.articles | reverse %}
     {% for article in sorted %}

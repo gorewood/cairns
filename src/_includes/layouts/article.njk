@@ -33,7 +33,10 @@
         {% endif %}
       </header>
 
-      <div class="article-body" data-animate>
+      <div class="article-body" data-animate data-pagefind-body
+           data-pagefind-meta="title:{{ title }}"
+           data-pagefind-filter="tag[data-tag]">
+        {% for tag in tags %}{% if tag != "articles" %}<span data-tag data-pagefind-filter="tag" hidden>{{ tag }}</span>{% endif %}{% endfor %}
         {{ content | safe }}
       </div>
 

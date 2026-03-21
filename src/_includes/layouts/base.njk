@@ -9,11 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/base.css"/>
   {% if pageCss %}<link rel="stylesheet" href="/css/{{ pageCss }}"/>{% endif %}
+  {% if search %}<link rel="stylesheet" href="/css/search.css"/>
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css"/>{% endif %}
 </head>
 <body>
   {% include "partials/header.njk" %}
   {% block body %}{{ content | safe }}{% endblock %}
   {% include "partials/footer.njk" %}
+  {% if search %}<script src="/pagefind/pagefind-ui.js"></script>
+  <script>
+    new PagefindUI({ element: "#search", showSubResults: true, showImages: false });
+  </script>{% endif %}
   {% block scripts %}{% endblock %}
 </body>
 </html>
