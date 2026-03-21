@@ -1,8 +1,10 @@
 <nav class="topnav">
-  <div class="topnav__brand">Cairns</div>
-  <ul class="topnav__links">
-    <li><a href="/" {% if page.url == "/" %}class="active"{% endif %}>Trailhead</a></li>
-    <li><a href="/library/" {% if page.url == "/library/" %}class="active"{% endif %}>Library</a></li>
-    <li><a href="/archives/" {% if page.url == "/archives/" %}class="active"{% endif %}>Archives</a></li>
-  </ul>
+  <div class="topnav__inner">
+    <div class="topnav__brand">Cairns</div>
+    <ul class="topnav__links">
+      <li><a href="/" {% if page.url == "/" %}class="active"{% endif %}>Trailhead</a></li>
+      <li><a href="/library/" {% if page.url == "/library/" %}class="active"{% endif %}>Library</a></li>
+      <li><a href="/archives/" {% if page.url == "/archives/" %}class="active"{% endif %}>Archives</a></li>
+    </ul>
+  </div>
 </nav>
