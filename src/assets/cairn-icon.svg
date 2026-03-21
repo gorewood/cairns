@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="22 34 160 160" fill="currentColor">
+  <defs>
+    <mask id="gaps">
+      <rect x="0" y="0" width="200" height="200" fill="white"/>
+      <ellipse cx="102" cy="62" rx="28" ry="4.4" fill="black"/>
+      <ellipse cx="97" cy="90" rx="44" ry="4.4" fill="black"/>
+      <ellipse cx="94" cy="120" rx="55" ry="4.4" fill="black"/>
+      <ellipse cx="99" cy="152" rx="64" ry="4.4" fill="black"/>
+    </mask>
+  </defs>
+  <g mask="url(#gaps)">
+    <ellipse cx="104" cy="49" rx="17" ry="11"/>
+    <ellipse cx="96" cy="75" rx="32" ry="14"/>
+    <ellipse cx="102" cy="105" rx="47" ry="16"/>
+    <ellipse cx="93" cy="137" rx="54" ry="17"/>
+    <ellipse cx="100" cy="170" rx="66" ry="20"/>
+  </g>
+</svg>

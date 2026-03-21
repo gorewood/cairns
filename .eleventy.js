@@ -75,6 +75,7 @@ module.exports = function (eleventyConfig) {
 
   // --- Passthrough copy ---
   eleventyConfig.addPassthroughCopy({ "src/_includes/css": "css" });
+  eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
 
   // --- Collections ---
   // "articles" tag is applied by src/articles/articles.json
