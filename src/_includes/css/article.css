@@ -454,6 +454,12 @@
 .article-body td strong {
   color: var(--text-bright);
 }
+.article-body table code {
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  background: var(--bg-card-alt);
+  border-radius: 3px;
+}
 
 /* ── Mermaid Diagrams ── */
 pre.mermaid {
@@ -482,6 +488,56 @@ pre.mermaid:has(.sequenceDiagram) svg,
 pre.mermaid:has([id^="sequence"]) svg {
   max-width: 100%;
   min-width: 600px;
+}
+
+/* ── Audience Badges ── */
+.badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
+.badge--audience {
+  background: var(--accent);
+  color: #fff;
+  opacity: 0.75;
+}
+.badge--draft {
+  background: var(--orange);
+  color: #fff;
+}
+
+/* ── Prerequisite Callout ── */
+.prereq-callout {
+  background: var(--bg-card-alt, var(--bg-card));
+  border-left: 3px solid var(--accent);
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+}
+.prereq-callout__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+.prereq-callout ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+.prereq-callout li {
+  margin-bottom: 0.2rem;
+}
+.prereq-callout a {
+  color: var(--accent);
 }
 
 /* ── Trail Navigation ── */

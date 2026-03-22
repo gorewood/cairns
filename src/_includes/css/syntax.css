@@ -1,0 +1,131 @@
+/* ============================================================
+   SYNTAX HIGHLIGHTING — Theme-Aware Prism Tokens
+   Uses CSS custom properties so colors adapt to light/dark mode.
+   Token classes are added at build time by markdown-it-prism.
+   ============================================================ */
+
+/* ── Light Mode (default) ── */
+:root {
+  --code-bg: #f0ece6;
+  --code-fg: #1a1a2e;
+  --token-comment: #6a7a6a;
+  --token-keyword: #7c3aed;
+  --token-string: #0d7c66;
+  --token-number: #c74d1a;
+  --token-function: #2563eb;
+  --token-operator: #555;
+  --token-class: #b45309;
+  --token-punctuation: #666;
+  --token-property: #2563eb;
+  --token-builtin: #7c3aed;
+  --token-attr-name: #b45309;
+  --token-attr-value: #0d7c66;
+  --token-tag: #c74d1a;
+  --token-selector: #7c3aed;
+  --token-inserted: #0d7c66;
+  --token-deleted: #c74d1a;
+  --token-changed: #2563eb;
+}
+
+/* ── Dark Mode ── */
+[data-theme="dark"] {
+  --code-bg: #1a1a2e;
+  --code-fg: #e0e0ec;
+  --token-comment: #6a7a8a;
+  --token-keyword: #c084fc;
+  --token-string: #6ee7b7;
+  --token-number: #fb923c;
+  --token-function: #93c5fd;
+  --token-operator: #a0a0b0;
+  --token-class: #fbbf24;
+  --token-punctuation: #888;
+  --token-property: #93c5fd;
+  --token-builtin: #c084fc;
+  --token-attr-name: #fbbf24;
+  --token-attr-value: #6ee7b7;
+  --token-tag: #fb923c;
+  --token-selector: #c084fc;
+  --token-inserted: #6ee7b7;
+  --token-deleted: #fb923c;
+  --token-changed: #93c5fd;
+}
+
+/* ── Code Blocks ── */
+pre[class*="language-"] {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 1rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  margin: 1rem 0 1.5rem;
+}
+
+code[class*="language-"] {
+  background: none;
+  color: inherit;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+/* ── Inline code (not in pre) ── */
+:not(pre) > code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+}
+
+/* ── Token Colors ── */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata { color: var(--token-comment); font-style: italic; }
+
+.token.keyword,
+.token.control,
+.token.directive { color: var(--token-keyword); font-weight: 500; }
+
+.token.string,
+.token.char,
+.token.template-string,
+.token.url { color: var(--token-string); }
+
+.token.number,
+.token.boolean { color: var(--token-number); }
+
+.token.function { color: var(--token-function); }
+
+.token.operator,
+.token.entity { color: var(--token-operator); }
+
+.token.class-name,
+.token.maybe-class-name { color: var(--token-class); }
+
+.token.punctuation { color: var(--token-punctuation); }
+
+.token.property,
+.token.constant,
+.token.variable,
+.token.symbol { color: var(--token-property); }
+
+.token.builtin { color: var(--token-builtin); }
+
+.token.attr-name { color: var(--token-attr-name); }
+.token.attr-value { color: var(--token-attr-value); }
+
+.token.tag { color: var(--token-tag); }
+.token.selector { color: var(--token-selector); }
+
+.token.inserted { color: var(--token-inserted); }
+.token.deleted { color: var(--token-deleted); text-decoration: line-through; }
+.token.changed { color: var(--token-changed); }
+
+.token.important,
+.token.bold { font-weight: 700; }
+.token.italic { font-style: italic; }
+
+/* ── Line numbers (optional future) ── */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid var(--border);
+}

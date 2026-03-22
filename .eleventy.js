@@ -1,6 +1,7 @@
 const markdownIt = require("markdown-it");
 const markdownItAnchor = require("markdown-it-anchor");
 const markdownItContainer = require("markdown-it-container");
+const markdownItPrism = require("markdown-it-prism");
 
 module.exports = function (eleventyConfig) {
   // --- Markdown-it with custom containers ---
@@ -71,8 +72,13 @@ module.exports = function (eleventyConfig) {
     },
   });
 
-  // ```mermaid fenced blocks → <pre class="mermaid">
-  const defaultFence = md.renderer.rules.fence;
+  // Syntax highlighting via Prism (build-time, adds token classes)
+  md.use(markdownItPrism, { defaultLanguage: "plaintext" });
+
+  // Mermaid: convert ```mermaid fenced blocks into <pre class="mermaid"> for client-side rendering
+  const defaultFence = md.renderer.rules.fence || function (tokens, idx, options, env, self) {
+    return self.renderToken(tokens, idx, options);
+  };
   md.renderer.rules.fence = function (tokens, idx, options, env, self) {
     const token = tokens[idx];
     if (token.info.trim() === "mermaid") {
@@ -137,6 +143,10 @@ module.exports = function (eleventyConfig) {
       day: "numeric",
       timeZone: "UTC",
     });
+  });
+
+  eleventyConfig.addFilter("slugify", function (str) {
+    return (str || "").toLowerCase().replace(/[^\w]+/g, "-").replace(/(^-|-$)/g, "");
   });
 
   eleventyConfig.addFilter("isoDate", function (date) {

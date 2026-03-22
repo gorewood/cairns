@@ -15,6 +15,7 @@
     "@11ty/eleventy": "^3.1.5",
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-container": "^4.0.0",
+    "markdown-it-prism": "^3.0.1",
     "pagefind": "^1.4.0"
   }
 }

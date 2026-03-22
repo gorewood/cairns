@@ -1,0 +1,91 @@
+---
+layout: layouts/base.njk
+title: Trails
+pageCss: index.css
+permalink: /trails/
+---
+<div class="layout" data-pagefind-ignore="all">
+
+  <!-- Left Sidebar -->
+  <aside class="sidebar-left">
+    <p class="label">Trails</p>
+    <p class="sublabel">Multi-Part Series</p>
+    <ul class="cat-list">
+      {% for trailName, articles in collections.trails %}
+      <li><a href="#trail-{{ trailName | slugify }}">{{ trailName }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <p class="label label--accent">Trails</p>
+    <h1 style="font-size:1.8rem;font-weight:700;color:var(--text-bright);margin-bottom:0.4rem;">Knowledge Trails</h1>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">Multi-part series that build understanding step by step. Start at the beginning or jump to what interests you.</p>
+
+    {% for trailName, articles in collections.trails %}
+    <div id="trail-{{ trailName | slugify }}" style="margin-bottom:3rem;">
+      <h2 style="font-size:1.2rem;font-weight:700;color:var(--text-bright);margin-bottom:0.3rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+        {{ trailName }}
+      </h2>
+
+      {%- set firstArticle = articles[0] -%}
+      {% if firstArticle.data.trailDescription %}
+      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1rem;">{{ firstArticle.data.trailDescription }}</p>
+      {% endif %}
+
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1rem;">
+        {{ articles | length }} {% if articles | length == 1 %}part{% else %}parts{% endif %}
+        &middot;
+        {%- set totalDuration = 0 -%}
+        {%- for a in articles -%}{%- set totalDuration = totalDuration + a.data.duration -%}{%- endfor -%}
+        ~{{ totalDuration }} min total reading time
+      </div>
+
+      <ol style="list-style:none;padding:0;margin:0;">
+        {% for article in articles %}
+        <li style="margin-bottom:0.8rem;padding-left:0;">
+          <div class="entry">
+            <div class="entry__head">
+              <div style="font-size:0.7rem;color:var(--accent);font-weight:600;margin-bottom:0.15rem;">Part {{ article.data.trailOrder }}</div>
+              <div class="entry__body">
+                <h3 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+                <p class="entry__desc">{{ article.data.subtitle }}</p>
+                <div class="entry__meta">
+                  <span>{{ article.data.duration }} min</span>
+                  {% if article.data.audience %}
+                  {% for aud in article.data.audience %}
+                  <span class="badge badge--audience">{{ aud }}</span>
+                  {% endfor %}
+                  {% endif %}
+                  {% if article.data.status == "draft" %}
+                  <span class="badge badge--draft">Draft</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+    {% endfor %}
+
+    {% if collections.trails | length == 0 %}
+    <p style="color:var(--text-muted);font-style:italic;">No trails yet. Check back soon.</p>
+    {% endif %}
+
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="sidebar-right">
+    <p class="label">Statistics</p>
+    <dl class="meta-table">
+      <dt>Trails</dt>
+      <dd>{{ collections.trails | length }}</dd>
+      <dt>Total Cairns</dt>
+      <dd>{{ collections.articles | length }}</dd>
+    </dl>
+  </aside>
+
+</div>

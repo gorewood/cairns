@@ -17,6 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/css/base.css"/>
   <link rel="stylesheet" href="/css/article.css"/>
+  <link rel="stylesheet" href="/css/syntax.css"/>
 </head>
 <body>
   {% include "partials/header.njk" %}
@@ -35,11 +36,27 @@
       <header class="article-header">
         <div class="article-header__eyebrow">Cairn &middot; {{ date | dateFormat }}</div>
         <h1 class="article-header__title">{{ title }}</h1>
-        <p class="article-header__subtitle">{{ subtitle }} &middot; ~{{ duration }} min read &middot; Suggested by {{ submitter }}</p>
+        <p class="article-header__subtitle">{{ subtitle }} &middot; ~{{ duration }} min read &middot; Suggested by {{ submitter }}
+          {% if audience %}{% for aud in audience %}<span class="badge badge--audience">{{ aud }}</span>{% endfor %}{% endif %}
+        </p>
         {% if lead %}
         <p class="article-header__lead">{{ lead | safe }}</p>
         {% endif %}
       </header>
+
+      {% if prerequisites %}
+      <div class="prereq-callout">
+        <span class="prereq-callout__label">Before reading this</span>
+        <ul>
+          {% for slug in prerequisites %}
+          {% set prereq = collections.articles | findBySlug(slug) %}
+          {% if prereq %}
+          <li><a href="{{ prereq.url }}">{{ prereq.data.title }}</a></li>
+          {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
 
       <div class="article-body" data-animate data-pagefind-body
            data-pagefind-meta="title:{{ title }}"
@@ -180,65 +197,67 @@
     }
   </script>
   <noscript><style>.article-body[data-animate] section{opacity:1;transform:none;}</style></noscript>
+  <!-- Mermaid: client-side diagram rendering with theme toggle support -->
   <script type="module">
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
-    const MERMAID_THEMES = {
-      dark: {
-        primaryColor: '#2a2a4a', primaryTextColor: '#e8e8f0',
-        primaryBorderColor: '#7c5cfc', lineColor: '#6a6a7a',
-        secondaryColor: '#1a1a28', tertiaryColor: '#14141f',
-        noteBkgColor: '#2a2a4a', noteTextColor: '#e8e8f0',
-        signalTextColor: '#e8e8f0', messageFontColor: '#c0c0cc',
-        actorBkg: '#2a2a4a', actorTextColor: '#e8e8f0',
-        edgeLabelBackground: '#14141f', labelBoxBkgColor: '#2a2a4a',
-        fontFamily: 'Inter, system-ui, sans-serif'
-      },
-      light: {
-        primaryColor: '#ddd8d0', primaryTextColor: '#1a1a2e',
-        primaryBorderColor: '#5a3fd4', lineColor: '#7a7a7a',
-        secondaryColor: '#f0f0eb', tertiaryColor: '#f5f5f0',
-        noteBkgColor: '#ddd8d0', noteTextColor: '#1a1a2e',
-        signalTextColor: '#1a1a2e', messageFontColor: '#3a3a3a',
-        actorBkg: '#ddd8d0', actorTextColor: '#1a1a2e',
-        edgeLabelBackground: '#f5f5f0', labelBoxBkgColor: '#ddd8d0',
-        fontFamily: 'Inter, system-ui, sans-serif'
-      }
+    const darkVars = {
+      darkMode: true, background: '#14141f',
+      primaryColor: '#2a2a4a', primaryTextColor: '#e8e8f0',
+      primaryBorderColor: '#7c5cfc', lineColor: '#c0c0cc',
+      secondaryColor: '#1e1e30', tertiaryColor: '#0c0c14',
+      noteBkgColor: '#2a2a4a', noteTextColor: '#e8e8f0',
+      signalTextColor: '#e8e8f0', labelTextColor: '#e8e8f0',
+      loopTextColor: '#e8e8f0', messageFontColor: '#e8e8f0',
+      actorTextColor: '#e8e8f0', actorBkg: '#2a2a4a', actorBorder: '#7c5cfc',
+      activationBorderColor: '#7c5cfc', activationBkgColor: '#1e1e30',
+      sequenceNumberColor: '#e8e8f0',
+      labelBoxBkgColor: '#2a2a4a', labelBoxBorderColor: '#7c5cfc',
+      edgeLabelBackground: '#1e1e30',
+      fontFamily: 'Inter, system-ui, sans-serif'
     };
 
-    function getTheme() {
-      return document.documentElement.getAttribute('data-theme') || 'dark';
+    const lightVars = {
+      darkMode: false, background: '#f5f5f0',
+      primaryColor: '#ddd8d0', primaryTextColor: '#1a1a2e',
+      primaryBorderColor: '#5a3fd4', lineColor: '#555',
+      secondaryColor: '#e8e4dc', tertiaryColor: '#f0ece6',
+      noteBkgColor: '#ddd8d0', noteTextColor: '#1a1a2e',
+      signalTextColor: '#1a1a2e', labelTextColor: '#1a1a2e',
+      loopTextColor: '#1a1a2e', messageFontColor: '#1a1a2e',
+      actorTextColor: '#1a1a2e', actorBkg: '#ddd8d0', actorBorder: '#5a3fd4',
+      activationBorderColor: '#5a3fd4', activationBkgColor: '#e8e4dc',
+      sequenceNumberColor: '#1a1a2e',
+      labelBoxBkgColor: '#ddd8d0', labelBoxBorderColor: '#5a3fd4',
+      edgeLabelBackground: '#f5f5f0',
+      fontFamily: 'Inter, system-ui, sans-serif'
+    };
+
+    // Store original diagram source for re-rendering on theme toggle
+    const mermaidBlocks = document.querySelectorAll('pre.mermaid');
+    const originals = Array.from(mermaidBlocks).map(el => el.textContent);
+
+    function getThemeConfig() {
+      const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+      return { startOnLoad: false, theme: isDark ? 'dark' : 'default', themeVariables: isDark ? darkVars : lightVars };
     }
 
-    // Store original diagram source before first render
-    const mermaidBlocks = document.querySelectorAll('pre.mermaid');
-    const originalSources = new Map();
-    mermaidBlocks.forEach(block => {
-      originalSources.set(block, block.textContent);
-    });
+    async function renderMermaid() {
+      mermaid.initialize(getThemeConfig());
+      mermaidBlocks.forEach((el, i) => {
+        el.removeAttribute('data-processed');
+        el.innerHTML = originals[i];
+      });
+      await mermaid.run({ nodes: mermaidBlocks });
+    }
 
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'base',
-      themeVariables: MERMAID_THEMES[getTheme()]
-    });
+    // Initial render
+    await renderMermaid();
 
-    // Re-render diagrams on theme toggle
+    // Re-render on theme toggle
     document.getElementById('theme-toggle').addEventListener('click', () => {
-      setTimeout(async () => {
-        // Reset blocks to original source text
-        mermaidBlocks.forEach(block => {
-          block.removeAttribute('data-processed');
-          block.innerHTML = originalSources.get(block);
-        });
-        // Re-initialize with new theme and re-render
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: MERMAID_THEMES[getTheme()]
-        });
-        await mermaid.run({ nodes: mermaidBlocks });
-      }, 50);
+      // Small delay to let the data-theme attribute update first
+      setTimeout(renderMermaid, 50);
     });
   </script>
 </body>
