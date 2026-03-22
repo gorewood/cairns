@@ -3,9 +3,9 @@
    ============================================================ */
 
 .guide-content {
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 3rem;
+  padding: 1.8rem 1.5rem 3rem;
 }
 
 .guide-header {
@@ -74,14 +74,18 @@
   text-decoration: underline;
 }
 
-/* Callout support */
+/* Callout spacing — type styles from article.css */
 .guide-body .callout {
   margin: 1.5rem 0;
-  padding: 1rem 1.2rem;
-  border-radius: 4px;
-  border-left: 3px solid var(--accent);
-  background: var(--bg-card);
 }
+
+/* Table styles */
+.guide-body table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.92rem; line-height: 1.5; }
+.guide-body thead { border-bottom: 2px solid var(--accent, #7c5cfc); }
+.guide-body th { text-align: left; padding: 0.6rem 0.8rem; font-weight: 600; color: var(--text-bright); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.guide-body td { padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border); color: var(--text); }
+.guide-body tbody tr:hover { background: var(--bg-card-alt, rgba(124, 92, 252, 0.04)); }
+.guide-body table code { font-size: 0.85em; padding: 0.1em 0.35em; background: var(--bg-card); border: 1px solid var(--border); border-radius: 3px; }
 
 .guide-content .colophon {
   margin-top: 3rem;

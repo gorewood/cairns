@@ -1,0 +1,369 @@
+/* ============================================================
+   ANNOTATION SYSTEM — Cairns
+   ============================================================ */
+
+/* ── Highlighted Annotated Text ── */
+.annotate-highlight {
+  background: rgba(251, 191, 36, 0.22);
+  border-bottom: 2px solid rgba(251, 191, 36, 0.5);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  color: var(--text-bright);
+}
+.annotate-highlight:hover {
+  background: rgba(251, 191, 36, 0.3);
+}
+[data-theme="light"] .annotate-highlight {
+  background: rgba(217, 170, 0, 0.15);
+  border-bottom-color: rgba(217, 170, 0, 0.5);
+  color: inherit;
+}
+[data-theme="light"] .annotate-highlight:hover {
+  background: rgba(217, 170, 0, 0.28);
+}
+
+/* ── Floating Selection Toolbar ── */
+.annotate-toolbar {
+  position: absolute;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: none;
+  animation: annotate-fade-in 0.12s ease;
+}
+.annotate-toolbar.visible {
+  display: block;
+}
+.annotate-toolbar button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.annotate-toolbar button:hover {
+  opacity: 0.85;
+}
+
+/* ── Inline Comment Input ── */
+.annotate-input {
+  position: absolute;
+  z-index: 1001;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem;
+  width: 300px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  display: none;
+  animation: annotate-fade-in 0.12s ease;
+}
+.annotate-input.visible {
+  display: block;
+}
+.annotate-input__preview {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  padding: 0.4rem;
+  background: var(--bg);
+  border-radius: 3px;
+  border-left: 2px solid var(--accent);
+  max-height: 3.6rem;
+  overflow: hidden;
+  line-height: 1.4;
+}
+.annotate-input textarea {
+  width: 100%;
+  min-height: 60px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.annotate-input textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.annotate-input__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.annotate-input__actions button {
+  border: none;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+.annotate-input__actions .annotate-save {
+  background: var(--accent);
+  color: #fff;
+}
+.annotate-input__actions .annotate-cancel {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.annotate-input__actions .annotate-cancel:hover {
+  color: var(--text);
+}
+
+/* ── Annotation Tray ── */
+.annotate-tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  transition: transform 0.25s ease;
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+}
+.annotate-tray.visible {
+  transform: translateY(0);
+}
+.annotate-tray__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.annotate-tray__count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.annotate-tray__count span {
+  color: var(--accent);
+}
+.annotate-tray__toggle-icon {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+.annotate-tray.expanded .annotate-tray__toggle-icon {
+  transform: rotate(180deg);
+}
+.annotate-tray__body {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  display: none;
+  overflow-y: auto;
+  padding: 0.6rem 1.5rem 1rem;
+  flex: 1;
+  max-height: 40vh;
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-muted) transparent;
+}
+.annotate-tray__body::-webkit-scrollbar {
+  width: 6px;
+}
+.annotate-tray__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.annotate-tray__body::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 3px;
+}
+.annotate-tray.expanded .annotate-tray__body {
+  display: block;
+}
+
+/* ── Tray Annotation Items ── */
+.annotate-tray__item {
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  background: var(--bg-card-alt, rgba(124, 92, 252, 0.04));
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.annotate-tray__item:hover {
+  background: rgba(124, 92, 252, 0.08);
+  border-color: var(--accent);
+}
+.annotate-tray__item + .annotate-tray__item {
+  margin-top: 0.35rem;
+}
+.annotate-tray__item-content {
+  flex: 1;
+  min-width: 0;
+}
+.annotate-tray__item-quote {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.annotate-tray__item-section {
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 0.2rem;
+}
+.annotate-tray__item-comment {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+.annotate-tray__item-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem;
+  flex-shrink: 0;
+  line-height: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.12s, background 0.12s;
+}
+.annotate-tray__item-delete:hover {
+  color: var(--orange);
+  background: rgba(255, 165, 0, 0.1);
+}
+
+/* ── Tray Actions ── */
+.annotate-tray__actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.7rem;
+  justify-content: flex-end;
+}
+.annotate-tray__actions button {
+  border: none;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.annotate-tray__clear {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border) !important;
+}
+.annotate-tray__clear:hover {
+  color: var(--text);
+}
+.annotate-tray__submit {
+  background: var(--accent);
+  color: #fff;
+}
+.annotate-tray__submit:hover {
+  opacity: 0.85;
+}
+
+/* ── Copy Fallback Message ── */
+.annotate-copy-msg {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1100;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+.annotate-copy-msg p {
+  font-size: 0.88rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+.annotate-copy-msg__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+.annotate-copy-msg__actions button {
+  border: none;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+}
+.annotate-copy-msg__copy {
+  background: var(--accent);
+  color: #fff;
+}
+.annotate-copy-msg__close {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border) !important;
+}
+.annotate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1099;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+@keyframes annotate-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Print: hide annotation UI ── */
+@media print {
+  .annotate-toolbar,
+  .annotate-input,
+  .annotate-tray,
+  .annotate-copy-msg,
+  .annotate-overlay {
+    display: none !important;
+  }
+}

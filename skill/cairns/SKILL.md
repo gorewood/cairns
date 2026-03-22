@@ -228,6 +228,17 @@ done
 ### Trail Continuity
 Verify all trails have sequential ordering with no gaps.
 
+## Inline Annotations (Optional)
+
+If enabled via `site.json` (requires `annotations.repo` config), articles include a client-side annotation system:
+- Readers select text → floating toolbar → add comment → annotations accumulate in localStorage
+- "Create GitHub Issue" bundles all annotations into a pre-formatted issue with section deep links
+- The `content-feedback` label is applied automatically
+
+This is article-only (loaded via `article.njk`, not `base.njk`). If `site.annotations` is not set, no annotation code is loaded.
+
+When the agent monitors GitHub issues, annotation-generated issues can be triaged and fixed automatically — content corrections pushed directly to main, framework changes via PR.
+
 ## Delivery Protocol
 
 When posting reports or announcements to a team channel:

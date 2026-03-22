@@ -193,6 +193,28 @@ Files to customize for your team:
 - **Cron schedules** — adjust timezones, cadences, and channel IDs to match your team's rhythm
 - **Tag vocabulary** — start with the defaults, let your agent evolve it as content grows
 - **Deployment target** — pick what fits: GitHub Pages (public), Cloudflare Pages + Access (private), or any static host
+- **Annotations** — enable inline feedback if you use GitHub Issues (see below)
+
+### Inline Annotations (Optional)
+
+Cairns includes an optional annotation system for collecting reader feedback directly on articles. Readers select text, add a comment, and submit all annotations as a bundled GitHub Issue with section deep links.
+
+**To enable**, add an `annotations` block to `src/_data/site.json`:
+
+```json
+{
+  "title": "Cairns",
+  "description": "Agent-powered knowledge trail system",
+  "url": "https://your-cairns-site.example.com",
+  "annotations": {
+    "repo": "your-org/cairns"
+  }
+}
+```
+
+This requires GitHub Issues enabled on the repo. The annotation UI appears automatically on all article pages. Annotations are stored in localStorage until submitted.
+
+If you don't add the `annotations` config, the annotation system is completely inert — no CSS, JS, or UI is loaded.
 
 ## Content Format
 

@@ -18,8 +18,9 @@
   <link rel="stylesheet" href="/css/base.css"/>
   <link rel="stylesheet" href="/css/article.css"/>
   <link rel="stylesheet" href="/css/syntax.css"/>
+  {% if site.annotations %}<link rel="stylesheet" href="/css/annotate.css"/>{% endif %}
 </head>
-<body>
+<body{% if site.annotations %} data-annotate-repo="{{ site.annotations.repo }}" data-annotate-url="{{ site.url }}"{% endif %}>
   {% include "partials/header.njk" %}
 
   <div class="progress-bar" id="progress"></div>
@@ -260,5 +261,6 @@
       setTimeout(renderMermaid, 50);
     });
   </script>
+  {% if site.annotations %}<script>{% include "js/annotate.js" %}</script>{% endif %}
 </body>
 </html>
