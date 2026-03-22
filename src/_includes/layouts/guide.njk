@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+pageCss: guide.css
+---
+<main class="guide-content">
+  <header class="guide-header">
+    <p class="label label--accent">Guide</p>
+    <h1 class="guide-header__title">{{ title }}</h1>
+    {% if subtitle %}
+    <p class="guide-header__subtitle">{{ subtitle }}</p>
+    {% endif %}
+  </header>
+  <div class="guide-body">
+    {{ content | safe }}
+  </div>
+  <div class="colophon">
+    <p><a href="/">&larr; Back to Trailhead</a></p>
+  </div>
+</main>

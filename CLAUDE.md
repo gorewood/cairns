@@ -10,13 +10,15 @@ Each article is a **cairn**. A multi-part series is a **trail**. The archive ind
 
 ```
 src/articles/             ← Agent writes markdown here
-src/_includes/layouts/    ← base.njk (listing pages), article.njk (articles)
-src/_includes/partials/   ← header.njk, footer.njk
-src/_includes/css/        ← base, article, index, search styles
+src/_includes/layouts/    ← base.njk, article.njk, guide.njk
+src/_includes/partials/   ← header.njk (with search), footer.njk
+src/_includes/css/        ← base, article, index, guide, search, syntax styles
 src/_data/site.json       ← Site config
-src/index.njk             ← Trailhead
+src/index.njk             ← Trailhead (trails → featured → recent)
+src/guide.md              ← How to use Cairns (customize for team)
 src/library.njk           ← Tag-organized view
 src/archives.njk          ← Chronological view
+src/trails.njk            ← Trail landing page
 src/tags.njk              ← Auto-generated tag pages
 skill/cairns/             ← OpenClaw skill + reference docs
 ```

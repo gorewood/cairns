@@ -8,16 +8,23 @@ description: >
 
 # Cairns — Knowledge Trail System
 
-You manage a static knowledge base built with Eleventy. Each article is a **cairn** — a self-contained knowledge marker. Multi-part series are **trails**. The archive index is the **trailhead**.
+You manage a static knowledge base built with Eleventy 3.x. Each article is a **cairn** — a self-contained knowledge marker. Multi-part series are **trails**. The homepage is the **trailhead**. The `/guide/` page explains how everything works.
 
 ## Repo Layout
 
 ```
-src/articles/    ← You write markdown here
-src/_includes/   ← Layouts, partials, CSS (do not modify)
-src/_data/       ← Site config
-src/index.njk    ← Trailhead template
-_site/           ← Build output (gitignored)
+src/articles/          ← You write markdown here
+src/_includes/
+  layouts/             ← article.njk, base.njk, guide.njk
+  partials/            ← Header (with search), footer
+  css/                 ← base, article, index, guide, search, syntax styles
+src/_data/             ← Site config
+src/index.njk          ← Trailhead (trails → featured → recent)
+src/guide.md           ← How to use Cairns (customize for your team)
+src/library.njk        ← Tag-organized view
+src/archives.njk       ← Chronological view
+src/trails.njk         ← Trail landing page
+_site/                 ← Build output (gitignored)
 ```
 
 ## Creating a Cairn
@@ -52,7 +59,12 @@ permalink: /articles/topic-slug/
 # Optional:
 trail: "Trail Name"           # Series name (multi-part content)
 trailOrder: 1                 # Position in the series (1-based)
+trailDescription: "..."       # Brief description shown on trailhead trail card (first cairn only)
 related: [other-slug]         # Slugs of related cairns
+audience: [technical]         # Audience badges: technical, business, operations
+contributors: [Name]          # People who improved the article over time
+featured: true                # Show as featured cairn on trailhead
+prerequisites: [other-slug]   # Renders a "Before reading this" box
 ---
 ```
 
@@ -92,6 +104,15 @@ Main text here.
 <span class="newthought">Opening phrase</span> continues the sentence...
 ```
 
+**Mermaid diagrams:**
+````markdown
+```mermaid
+graph TD
+  A[Start] --> B[End]
+```
+````
+Theme-aware (adapts to light/dark mode). Do NOT use inline style directives on Mermaid nodes.
+
 See `{baseDir}/references/content-format.md` for full syntax reference.
 
 ### 4. Content Structure
@@ -124,7 +145,7 @@ Verify:
 - TOC sidebar populates from h2 headings
 - Callouts display with correct colors
 - Article appears in Trailhead, Library, Archives, and tag pages
-- Pagefind search finds the article content
+- Pagefind search (magnifying glass in header) finds the article
 
 ### 6. Publish
 
@@ -134,7 +155,14 @@ git commit -m "Add cairn: Article Title"
 git push
 ```
 
-CI builds and deploys automatically on push to main.
+CI auto-deploys on push to main. If you have a memory system, index the new cairn after publishing.
+
+## Content Guidelines
+
+- When a team member suggests the topic, use their name as submitter.
+- When the agent originates the topic, use "Agent" or your configured agent name.
+- Anonymize technical PII: user IDs, channel IDs, API keys, tokens, passwords, IP addresses.
+- Customize the `/guide/` page for your team's specific channels and contribution workflows.
 
 ## Tag Vocabulary
 
@@ -152,9 +180,20 @@ grep -rh "^tags:" src/articles/ | sort -u
 For topics exceeding 20 minutes:
 
 1. Set `trail: "Series Name"` and `trailOrder: N` in each part's frontmatter
-2. The article layout auto-renders prev/next navigation
-3. All parts share the same `trail` value
-4. Order is 1-based and sequential
+2. Set `trailDescription` on the first cairn — it appears on the trailhead trail card
+3. Optionally set `audience` tags for badge rendering on the trail landing page
+4. The article layout auto-renders prev/next navigation
+5. All parts share the same `trail` value
+6. Order is 1-based and sequential
+
+## Trailhead
+
+The trailhead (homepage) shows:
+1. Featured Trails — cards with title, part count, reading time, description
+2. Featured Cairn — articles with `featured: true`, or most recent non-trail article
+3. Recent cairns — last 5, excluding featured, with "Library →" link
+
+A dismissable welcome banner points new users to `/guide/`.
 
 ## Maintenance Tasks
 
@@ -168,7 +207,7 @@ grep -rh "^tags:" src/articles/ | sed 's/tags: \[//;s/\]//' | tr ',' '\n' | sed 
 Look for: duplicate/similar tags, unused tags, tags that should be merged.
 
 ### Cross-Link Audit
-For each article, check if there are other articles on related topics that should be linked via the `related` frontmatter field.
+Check articles for related topics that should be linked via the `related` frontmatter field.
 
 ### Content Freshness
 Flag articles older than 6 months for review. Check if facts, links, or recommendations are still current.
@@ -186,3 +225,10 @@ done
 
 ### Trail Continuity
 Verify all trails have sequential ordering with no gaps.
+
+## Delivery Protocol
+
+When posting reports or announcements to a team channel:
+1. Send a SHORT summary as the opening post
+2. Send full details as a threaded reply
+3. This keeps channels clean — people opt into detail by opening the thread

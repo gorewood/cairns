@@ -20,7 +20,13 @@
 |-------|------|-------------|
 | `trail` | string | Series name. All parts of a series share this value. |
 | `trailOrder` | number | Position in the series (1-based). |
-| `related` | array | File slugs of related cairns (without date prefix or extension). |
+| `trailDescription` | string | Brief description shown on trailhead trail card. Set on the first cairn in a trail. |
+| `related` | array | File slugs of related cairns (without path or extension). |
+| `audience` | array | Audience badges rendered in subtitle and trail page. Values: `technical`, `business`, `operations`. |
+| `contributors` | array | Names of people who improved the article over time. |
+| `featured` | boolean | If `true`, this article appears as the Featured Cairn on the trailhead. Only one should be true at a time. |
+| `prerequisites` | array | Slugs of articles that should be read first. Renders a "Before reading this" callout. |
+| `sources` | array | Paths to authoritative source documents. Useful for content drift detection in maintenance crons. |
 
 ## Example
 
@@ -39,6 +45,7 @@ lead: >
   is six people and your budget is "we have AWS credits."
 permalink: /articles/zero-trust-small-teams/
 related: [the-quiet-teammate]
+audience: [technical]
 ---
 ```
 
@@ -52,7 +59,7 @@ related: [the-quiet-teammate]
 
 ## Permalink Convention
 
-Always use `/articles/{slug}/` format where slug is the topic in kebab-case, without the date prefix. The date is in the frontmatter, not the URL.
+Always use `/articles/{slug}/` format where slug is the topic in kebab-case, without date prefix. The date is in the frontmatter, not the URL.
 
 ## File Naming
 

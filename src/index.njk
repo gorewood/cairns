@@ -2,29 +2,87 @@
 layout: layouts/base.njk
 title: Trailhead
 pageCss: index.css
-search: true
 ---
+<!-- Welcome Banner (dismissable) -->
+<div class="welcome-banner" id="welcome-banner">
+  <div class="welcome-banner__inner">
+    <span>New here? <a href="/guide/">Start with the Guide &rarr;</a></span>
+    <button class="welcome-banner__dismiss" id="dismiss-banner" aria-label="Dismiss">&times;</button>
+  </div>
+</div>
+
 <div class="layout" data-pagefind-ignore="all">
 
   <!-- Left Sidebar -->
   <aside class="sidebar-left">
     <p class="label">Categories</p>
-    <p class="sublabel">Knowledge Trails</p>
     <ul class="cat-list">
       {% for tag in collections.tagList %}
       <li><a href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a></li>
       {% endfor %}
     </ul>
+    <hr class="sidebar-sep"/>
+    <a href="/guide/" class="sidebar-guide-link">Guide &rarr;</a>
   </aside>
 
   <!-- Main Content -->
   <main class="main-content">
 
+    <!-- Featured Trails -->
+    {% if collections.trails | length %}
+    <div class="section-header">
+      <p class="label label--accent">Featured Trails</p>
+      {% if collections.trails | length > 1 %}
+      <a href="/trails/" class="section-header__cta">All Trails &rarr;</a>
+      {% endif %}
+    </div>
+    <div class="trail-cards">
+      {%- set trailCount = 0 -%}
+      {% for trailName, articles in collections.trails %}
+        {%- if trailCount < 3 -%}
+      <a href="/trails/#trail-{{ trailName | slugify }}" class="trail-card">
+        <div class="trail-card__title">{{ trailName }}</div>
+        <div class="trail-card__meta">
+          {{ articles | length }} parts &middot;
+          {%- set totalDuration = 0 -%}
+          {%- for a in articles -%}{%- set totalDuration = totalDuration + a.data.duration -%}{%- endfor -%}
+          ~{{ totalDuration }} min
+        </div>
+        {% set firstArticle = articles | first %}
+        {% if firstArticle.data.trailDescription %}
+        <p class="trail-card__desc">{{ firstArticle.data.trailDescription }}</p>
+        {% endif %}
+      </a>
+        {%- set trailCount = trailCount + 1 -%}
+        {%- endif -%}
+      {% endfor %}
+    </div>
+    {% if collections.trails | length > 3 %}
+    <a href="/trails/" class="section-more-link">See all {{ collections.trails | length }} trails &rarr;</a>
+    {% endif %}
+    {% endif %}
+
+    <!-- Featured Cairn -->
     {% set sorted = collections.articles | reverse %}
-    {% set featured = sorted | first %}
+    {% set featured = null %}
+    {% for article in sorted %}
+      {% if article.data.featured and not featured %}
+        {% set featured = article %}
+      {% endif %}
+    {% endfor %}
+    {% if not featured %}
+      {% for article in sorted %}
+        {% if not article.data.trail and not featured %}
+          {% set featured = article %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {% if not featured %}
+      {% set featured = sorted | first %}
+    {% endif %}
+
     {% if featured %}
-    <!-- Featured Selection -->
-    <p class="label label--accent">Latest Cairn</p>
+    <p class="label label--accent">Featured Cairn</p>
     <div class="hero-card">
       <div class="hero-card__title">{{ featured.data.title }}</div>
       <p class="hero-card__desc">{{ featured.data.subtitle }}</p>
@@ -43,37 +101,32 @@ search: true
     </div>
     {% endif %}
 
-    <!-- Search -->
-    <div id="search" data-pagefind-ignore></div>
-    <div class="tag-pills">
-      {% for tag in collections.tagList %}
-      <a class="tag-pill" href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a>
-      {% endfor %}
-    </div>
-
-    <!-- Article Entries -->
+    <!-- Recent Cairns -->
+    <p class="label">Recent</p>
+    {% set recentCount = 0 %}
     {% for article in sorted %}
-    <div class="entry{% if loop.first %} entry--featured{% endif %}">
-      <div class="entry__head">
-        <div class="entry__body">
-          {% set topicTags = article.data.tags | reject("equalto", "articles") %}
-          {% if topicTags | length %}
-          <span class="entry__cat">{{ topicTags | first | tagDisplay }}</span>
-          {% endif %}
-          <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
-          <p class="entry__desc">{{ article.data.subtitle }}</p>
-          <div class="entry__meta">
-            <span>{{ article.data.date | dateFormat }}</span>
-            <span>{{ article.data.duration }} min</span>
-            <span>{{ article.data.submitter }}</span>
+      {% if article.url != featured.url and recentCount < 5 %}
+      <div class="entry">
+        <div class="entry__head">
+          <div class="entry__body">
+            {% set topicTags = article.data.tags | reject("equalto", "articles") %}
+            {% if topicTags | length %}
+            <span class="entry__cat">{{ topicTags | first | tagDisplay }}</span>
+            {% endif %}
+            <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
+            <p class="entry__desc">{{ article.data.subtitle }}</p>
+            <div class="entry__meta">
+              <span>{{ article.data.date | dateFormat }}</span>
+              <span>{{ article.data.duration }} min</span>
+              <span>{{ article.data.submitter }}</span>
+            </div>
           </div>
-          {% if loop.first %}
-          <a class="entry__reading-link" href="{{ article.url }}">Begin Reading &rarr;</a>
-          {% endif %}
         </div>
       </div>
-    </div>
+      {% set recentCount = recentCount + 1 %}
+      {% endif %}
     {% endfor %}
+    <a href="/library/" class="section-more-link">Library &rarr;</a>
 
   </main>
 
@@ -96,9 +149,28 @@ search: true
     <dl class="meta-table">
       <dt>Articles</dt>
       <dd>{{ collections.articles | length }}</dd>
+      <dt>Trails</dt>
+      <dd>{{ collections.trails | length }}</dd>
       <dt>Status</dt>
       <dd>NOMINAL</dd>
     </dl>
   </aside>
 
 </div>
+
+<script>
+  // Welcome banner dismiss
+  (function() {
+    var banner = document.getElementById('welcome-banner');
+    var btn = document.getElementById('dismiss-banner');
+    if (!banner || !btn) return;
+    if (localStorage.getItem('cairns-guide-dismissed') === 'true') {
+      banner.remove();
+      return;
+    }
+    btn.addEventListener('click', function() {
+      localStorage.setItem('cairns-guide-dismissed', 'true');
+      banner.remove();
+    });
+  })();
+</script>

@@ -2,7 +2,6 @@
 layout: layouts/base.njk
 title: Archives
 pageCss: index.css
-search: true
 permalink: /archives/
 ---
 <div class="layout" data-pagefind-ignore="all">
@@ -23,9 +22,6 @@ permalink: /archives/
     <p class="label label--accent">Archives</p>
     <h1 style="font-size:1.8rem;font-weight:700;color:var(--text-bright);margin-bottom:0.4rem;">All Cairns</h1>
     <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:2rem;">Complete chronological listing, newest first.</p>
-
-    <!-- Search -->
-    <div id="search" data-pagefind-ignore></div>
 
     {% set sorted = collections.articles | reverse %}
     {% for article in sorted %}

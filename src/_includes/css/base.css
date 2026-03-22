@@ -109,6 +109,46 @@ a:hover { text-decoration: underline; }
   border-bottom: 2px solid var(--accent);
 }
 
+/* ── Header Actions ── */
+.topnav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.search-toggle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.35rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+.search-toggle-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ── Search Overlay ── */
+.search-overlay {
+  display: none;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+  position: relative;
+  z-index: 99;
+}
+.search-overlay--open {
+  display: block;
+}
+.search-overlay__inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
 /* ── Theme Toggle ── */
 .theme-toggle {
   background: none;
