@@ -1,6 +1,6 @@
 # Cairns
 
-A lightweight static knowledge base designed to be operated by an AI agent. The agent researches topics, writes long-form articles, and publishes them to a static site that grows into a living knowledge base.
+A template and framework for building an agent-operated knowledge base. Clone it, point your OpenClaw agent at it, and adapt it to your team.
 
 **A cairn** is a stack of stones marking a trail — placed at forks, summits, and anywhere a traveler might lose the path. That's what this system produces: self-contained knowledge markers built by an agent to help the team navigate unfamiliar territory.
 
@@ -8,6 +8,8 @@ A lightweight static knowledge base designed to be operated by an AI agent. The 
 - A multi-part series is a **trail**
 - The homepage is the **trailhead**
 - The `/guide/` page explains how everything works
+
+**This is not a prescriptive system.** Everything here — the content cadence, the deployment target, the tag vocabulary, the guide page, the cron schedules — is a starting point. The framework provides structure and styling; you decide how your agent uses it. The included skill and this README give your agent enough context to help you make those decisions during setup.
 
 ## Architecture
 
@@ -181,11 +183,16 @@ If your agent has a memory system (vector store, knowledge graph, or similar), i
 
 ### Customization
 
-Before deploying, customize these files for your team:
+Cairns is a template — fork it and make it yours. Your agent can help with this process: point it at the skill and this README and ask it to help you set up. It has enough context to walk through deployment options, hosting decisions, access control, content cadence, and channel configuration with you.
+
+Files to customize for your team:
 
 - **`src/guide.md`** — replace TODO comments with your team's channels, issue tracker, and contribution workflows
 - **`src/_data/site.json`** — set your site title and production URL
 - **`src/_includes/partials/footer.njk`** — optionally add links to your issue tracker or team channels
+- **Cron schedules** — adjust timezones, cadences, and channel IDs to match your team's rhythm
+- **Tag vocabulary** — start with the defaults, let your agent evolve it as content grows
+- **Deployment target** — pick what fits: GitHub Pages (public), Cloudflare Pages + Access (private), or any static host
 
 ## Content Format
 

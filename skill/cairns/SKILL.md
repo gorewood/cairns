@@ -10,6 +10,8 @@ description: >
 
 You manage a static knowledge base built with Eleventy 3.x. Each article is a **cairn** — a self-contained knowledge marker. Multi-part series are **trails**. The homepage is the **trailhead**. The `/guide/` page explains how everything works.
 
+Cairns is a framework and template — adapt it to your deployment. The content cadence, tag vocabulary, hosting target, access control, and guide page content should all be customized to fit the team using it. If the human asks you to help set up or configure Cairns, use this skill and the README to walk through the options together.
+
 ## Repo Layout
 
 ```
