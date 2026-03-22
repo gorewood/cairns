@@ -1,6 +1,6 @@
 # Cairns
 
-A template and framework for building an agent-operated knowledge base. Clone it, point your OpenClaw agent at it, and adapt it to your team.
+A static knowledge base designed to be **owned and operated by an AI agent**. The agent researches topics, writes long-form articles, publishes them, maintains quality, and processes reader feedback — all autonomously. Humans suggest topics, read articles, and annotate problems. The agent does everything else.
 
 **A cairn** is a stack of stones marking a trail — placed at forks, summits, and anywhere a traveler might lose the path. That's what this system produces: self-contained knowledge markers built by an agent to help the team navigate unfamiliar territory.
 
@@ -9,7 +9,33 @@ A template and framework for building an agent-operated knowledge base. Clone it
 - The homepage is the **trailhead**
 - The `/guide/` page explains how everything works
 
-**This is not a prescriptive system.** Everything here — the content cadence, the deployment target, the tag vocabulary, the guide page, the cron schedules — is a starting point. The framework provides structure and styling; you decide how your agent uses it. The included skill and this README give your agent enough context to help you make those decisions during setup.
+## Why This Exists
+
+Every small team has institutional knowledge trapped in chat threads, one person's head, or nowhere. Building a proper knowledge base was always "nice to have" but never worth the engineering time. The ROI math didn't work.
+
+Cairns changes that math. An AI agent handles the entire content lifecycle — from research to publishing to maintenance — while humans stay in the loop through low-friction feedback mechanisms.
+
+### What Makes It Different
+
+**The agent can access your codebase and internal docs.** When it writes about your system architecture, it can read your actual source code, deployment configs, and decision records — not work from a design doc someone forwarded. Cross-referenced with live web research on the patterns and technologies involved, the result reads like documentation written by a senior engineer who's been on the project for months.
+
+**Content improves itself.** Readers annotate articles directly — select text, add a comment, submit a GitHub issue with one click. An issue monitor triages the feedback, fixes the content, and pushes the update. The loop from "I spotted a problem" to "it's fixed on the live site" can close without human intervention.
+
+**Multi-audience documentation from one source.** A single trail (multi-part series) can serve executives who want business framing, new hires who need onboarding context, and engineers who need architectural reference — because the agent has access to enough context to write for all three.
+
+### The Feedback Loop
+
+```
+Reader spots problem → Selects text → Adds annotation → Creates GitHub issue
+                                                              ↓
+                    Article updated ← Agent pushes fix ← Issue monitor triages
+                         ↓
+                  Static host deploys automatically
+```
+
+The inline annotation system is entirely client-side — vanilla JavaScript, localStorage for persistence, GitHub Issues URL parameters for pre-populated issue creation. No server, no database, no accounts beyond GitHub. (Annotations are optional — see Customization below.)
+
+**This is a template and framework**, not a prescriptive system. Everything here — the content cadence, the deployment target, the tag vocabulary, the guide page, the cron schedules — is a starting point. The framework provides structure and styling; you decide how your agent uses it. The included skill and this README give your agent enough context to help you make those decisions during setup.
 
 ## Architecture
 

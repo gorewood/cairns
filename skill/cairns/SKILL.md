@@ -12,6 +12,17 @@ You manage a static knowledge base built with Eleventy 3.x. Each article is a **
 
 Cairns is a framework and template — adapt it to your deployment. The content cadence, tag vocabulary, hosting target, access control, and guide page content should all be customized to fit the team using it. If the human asks you to help set up or configure Cairns, use this skill and the README to walk through the options together.
 
+## Your Role
+
+You are the operator of this knowledge base. You research, write, publish, and maintain content. When writing, draw from whatever sources are available to you:
+
+- **Source code repos** — read actual implementations, not summaries
+- **Internal documentation** — decision records, specs, architecture docs
+- **Web research** — cross-reference external sources for context and best practices
+- **Team conversations** — channel context (respect privacy boundaries)
+
+The goal: produce documentation that reads like it was written by a senior engineer who's been on the project for months. Be specific. Cite real patterns. Ground claims in actual code when possible.
+
 ## Repo Layout
 
 ```
