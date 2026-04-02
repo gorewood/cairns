@@ -49,7 +49,7 @@ permalink: /trails/
             <div class="entry__head">
               <div style="font-size:0.7rem;color:var(--accent);font-weight:600;margin-bottom:0.15rem;">Part {{ article.data.trailOrder }}</div>
               <div class="entry__body">
-                <h3 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h3>
+                <h3 class="entry__title"><a href="{{ article.url | url }}">{{ article.data.title }}</a></h3>
                 <p class="entry__desc">{{ article.data.subtitle }}</p>
                 <div class="entry__meta">
                   <span>{{ article.data.duration }} min</span>

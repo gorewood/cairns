@@ -36,7 +36,7 @@ eleventyComputed:
     <div class="entry">
       <div class="entry__head">
         <div class="entry__body">
-          <h2 class="entry__title"><a href="{{ article.url }}">{{ article.data.title }}</a></h2>
+          <h2 class="entry__title"><a href="{{ article.url | url }}">{{ article.data.title }}</a></h2>
           <p class="entry__desc">{{ article.data.subtitle }}</p>
           <div class="entry__meta">
             <span>{{ article.data.date | dateFormat }}</span>

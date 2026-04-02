@@ -52,7 +52,7 @@
           {% for slug in prerequisites %}
           {% set prereq = collections.articles | findBySlug(slug) %}
           {% if prereq %}
-          <li><a href="{{ prereq.url }}">{{ prereq.data.title }}</a></li>
+          <li><a href="{{ prereq.url | url }}">{{ prereq.data.title }}</a></li>
           {% endif %}
           {% endfor %}
         </ul>
@@ -82,12 +82,12 @@
             {% if item.data.trailOrder == trailOrder + 1 %}{% set next = item %}{% endif %}
           {% endfor %}
           {% if prev %}
-          <a href="{{ prev.url }}" class="trail-nav__link trail-nav__prev">&larr; {{ prev.data.title }}</a>
+          <a href="{{ prev.url | url }}" class="trail-nav__link trail-nav__prev">&larr; {{ prev.data.title }}</a>
           {% else %}
           <span class="trail-nav__link trail-nav__disabled">&larr; Start of trail</span>
           {% endif %}
           {% if next %}
-          <a href="{{ next.url }}" class="trail-nav__link trail-nav__next">{{ next.data.title }} &rarr;</a>
+          <a href="{{ next.url | url }}" class="trail-nav__link trail-nav__next">{{ next.data.title }} &rarr;</a>
           {% else %}
           <span class="trail-nav__link trail-nav__disabled">End of trail &rarr;</span>
           {% endif %}
@@ -103,7 +103,7 @@
           {% for slug in related %}
           {% set rel = collections.articles | findBySlug(slug) %}
           {% if rel %}
-          <li><a href="{{ rel.url }}">{{ rel.data.title }}</a> — {{ rel.data.subtitle }}</li>
+          <li><a href="{{ rel.url | url }}">{{ rel.data.title }}</a> — {{ rel.data.subtitle }}</li>
           {% endif %}
           {% endfor %}
         </ul>
