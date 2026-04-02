@@ -161,6 +161,7 @@ module.exports.config = {
     data: "_data",
     output: "_site",
   },
+  pathPrefix: process.env.SITE_PATH_PREFIX || "/",
   templateFormats: ["md", "njk", "html"],
   markdownTemplateEngine: "njk",
   htmlTemplateEngine: "njk",

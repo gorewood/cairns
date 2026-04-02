@@ -16,12 +16,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="/css/base.css"/>
-  {% if pageCss %}<link rel="stylesheet" href="/css/{{ pageCss }}"/>{% endif %}
-  {% if extraCss %}{% for css in extraCss %}<link rel="stylesheet" href="/css/{{ css }}"/>
+  <link rel="stylesheet" href="{{ '/css/base.css' | url }}"/>
+  {% if pageCss %}<link rel="stylesheet" href="{{ '/css/' | url }}{{ pageCss }}"/>{% endif %}
+  {% if extraCss %}{% for css in extraCss %}<link rel="stylesheet" href="{{ '/css/' | url }}{{ css }}"/>
   {% endfor %}{% endif %}
-  <link rel="stylesheet" href="/css/search.css"/>
-  <link rel="stylesheet" href="/pagefind/pagefind-ui.css"/>
+  <link rel="stylesheet" href="{{ '/css/search.css' | url }}"/>
+  <link rel="stylesheet" href="{{ '/pagefind/pagefind-ui.css' | url }}"/>
 </head>
 <body>
   {% include "partials/header.njk" %}
@@ -36,7 +36,7 @@
       localStorage.setItem('cairns-theme', next);
     });
   </script>
-  <script src="/pagefind/pagefind-ui.js"></script>
+  <script src="{{ '/pagefind/pagefind-ui.js' | url }}"></script>
   <script>
     // Header search toggle
     (function() {

@@ -1,15 +1,15 @@
 <nav class="topnav">
   <div class="topnav__inner">
-    <a href="/trailhead/" class="topnav__brand">
+    <a href="{{ '/trailhead/' | url }}" class="topnav__brand">
       <svg class="topnav__logo" xmlns="http://www.w3.org/2000/svg" viewBox="22 34 160 160" fill="currentColor" aria-hidden="true"><defs><mask id="gaps"><rect x="0" y="0" width="200" height="200" fill="white"/><ellipse cx="102" cy="62" rx="28" ry="4.4" fill="black"/><ellipse cx="97" cy="90" rx="44" ry="4.4" fill="black"/><ellipse cx="94" cy="120" rx="55" ry="4.4" fill="black"/><ellipse cx="99" cy="152" rx="64" ry="4.4" fill="black"/></mask></defs><g mask="url(#gaps)"><ellipse cx="104" cy="49" rx="17" ry="11"/><ellipse cx="96" cy="75" rx="32" ry="14"/><ellipse cx="102" cy="105" rx="47" ry="16"/><ellipse cx="93" cy="137" rx="54" ry="17"/><ellipse cx="100" cy="170" rx="66" ry="20"/></g></svg>
       Cairns
     </a>
     <ul class="topnav__links">
-      <li><a href="/trailhead/" {% if page.url == "/trailhead/" %}class="active"{% endif %}>Trailhead</a></li>
-      <li><a href="/trails/" {% if page.url == "/trails/" %}class="active"{% endif %}>Trails</a></li>
-      <li><a href="/guide/" {% if page.url == "/guide/" %}class="active"{% endif %}>Guide</a></li>
-      <li><a href="/library/" {% if page.url == "/library/" %}class="active"{% endif %}>Library</a></li>
-      <li><a href="/archives/" {% if page.url == "/archives/" %}class="active"{% endif %}>Archives</a></li>
+      <li><a href="{{ '/trailhead/' | url }}" {% if page.url == "/trailhead/" %}class="active"{% endif %}>Trailhead</a></li>
+      <li><a href="{{ '/trails/' | url }}" {% if page.url == "/trails/" %}class="active"{% endif %}>Trails</a></li>
+      <li><a href="{{ '/guide/' | url }}" {% if page.url == "/guide/" %}class="active"{% endif %}>Guide</a></li>
+      <li><a href="{{ '/library/' | url }}" {% if page.url == "/library/" %}class="active"{% endif %}>Library</a></li>
+      <li><a href="{{ '/archives/' | url }}" {% if page.url == "/archives/" %}class="active"{% endif %}>Archives</a></li>
     </ul>
     <div class="topnav__actions">
       <button class="search-toggle-btn" id="search-toggle" aria-label="Search" title="Search">

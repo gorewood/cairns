@@ -26,7 +26,7 @@ permalink: /library/
     {% for tag in collections.tagList %}
     <div id="tag-{{ tag }}" style="margin-bottom:2.5rem;">
       <h2 style="font-size:1.1rem;font-weight:700;color:var(--text-bright);margin-bottom:0.8rem;padding-top:1.5rem;border-top:1px solid var(--border);">
-        <a href="/tags/{{ tag }}/" style="color:var(--accent);text-decoration:none;">{{ tag | tagDisplay }}</a>
+        <a href="{{ '/tags/' | url }}{{ tag }}/" style="color:var(--accent);text-decoration:none;">{{ tag | tagDisplay }}</a>
         <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400;margin-left:0.5rem;">{{ collections[tag] | length }} {% if collections[tag] | length == 1 %}cairn{% else %}cairns{% endif %}</span>
       </h2>
       {% for article in collections[tag] | reverse %}

@@ -12,7 +12,7 @@ permalink: /archives/
     <p class="sublabel">Knowledge Trails</p>
     <ul class="cat-list">
       {% for tag in collections.tagList %}
-      <li><a href="/tags/{{ tag }}/">{{ tag | tagDisplay }}</a></li>
+      <li><a href="{{ '/tags/' | url }}{{ tag }}/">{{ tag | tagDisplay }}</a></li>
       {% endfor %}
     </ul>
   </aside>
@@ -42,7 +42,7 @@ permalink: /archives/
         </div>
         <div class="entry__aside">
           {% for tag in topicTags %}
-          <a href="/tags/{{ tag }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ tag }}</a>
+          <a href="{{ '/tags/' | url }}{{ tag }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ tag }}</a>
           {% endfor %}
         </div>
       </div>

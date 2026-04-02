@@ -21,7 +21,7 @@ eleventyComputed:
     <p class="label">All Topics</p>
     <ul class="cat-list">
       {% for t in collections.tagList %}
-      <li><a href="/tags/{{ t }}/"{% if t == tag %} class="active"{% endif %}>{{ t | tagDisplay }}</a></li>
+      <li><a href="{{ '/tags/' | url }}{{ t }}/"{% if t == tag %} class="active"{% endif %}>{{ t | tagDisplay }}</a></li>
       {% endfor %}
     </ul>
   </aside>
@@ -47,14 +47,14 @@ eleventyComputed:
         <div class="entry__aside">
           {% set topicTags = article.data.tags | reject("equalto", "articles") | reject("equalto", tag) %}
           {% for t in topicTags %}
-          <a href="/tags/{{ t }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ t }}</a>
+          <a href="{{ '/tags/' | url }}{{ t }}/" class="tag-pill" style="font-size:0.58rem;padding:0.15rem 0.45rem;">{{ t }}</a>
           {% endfor %}
         </div>
       </div>
     </div>
     {% endfor %}
 
-    <p style="margin-top:2rem;"><a href="/library/">&larr; Back to Library</a></p>
+    <p style="margin-top:2rem;"><a href="{{ '/library/' | url }}">&larr; Back to Library</a></p>
   </main>
 
   <!-- Right Sidebar -->
