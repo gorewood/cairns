@@ -181,12 +181,31 @@ The feedback loop transforms readers from passive consumers into active contribu
 
 :::
 
+## Trust Boundaries Are Yours to Define
+
+<span class="newthought">Cairns is a framework, not a managed service.</span> Every deployment makes its own decisions about what the agent can access, who can direct it, and what it's allowed to publish. This applies to the feedback loop, on-demand content requests, and the source material the agent reads — internal repos, Notion workspaces, Slack history, external APIs, all of it.
+
+Cairns does not prescribe trust boundaries. The deployer is responsible for:
+
+- **Source access** — which repos, docs, and systems the agent can read from
+- **Input authority** — who can request new content or corrections, and through what channels
+- **Publication controls** — whether the agent commits directly to main or goes through PR review
+- **Content scope** — what topics are in bounds and what material is too sensitive to synthesize
+
+::: callout warn
+
+LLM security is its own subject and an active area of research. Prompt injection, data exfiltration, and unintended information disclosure are real risks when an agent reads from multiple sources and publishes to a shared surface. Deployers assume responsibility for understanding and mitigating these risks in their environment. Constant vigilance and adaptation are key to operating any agent-powered platform.
+
+:::
+
+There are good practices — scoped API keys, read-only defaults, human review gates, content sandboxing — and we've developed in-depth guidance on LLM security for our own deployments. But the right configuration depends entirely on your threat model, your data sensitivity, and your team's risk tolerance. Cairns gives you the levers. Pulling them is your job.
+
 ## Discussion Prompts
 
 <ul class="discussion-prompts">
 <li>What's the current path for someone on your team to correct a wrong piece of documentation? How many steps does it take?</li>
 <li>Would your team be more likely to give feedback through inline annotations or through a Slack command like "@agent this article is wrong about X"?</li>
-<li>How important is verification before auto-correction? Are there domains where you'd want human review for every change?</li>
+<li>What are the trust boundaries for your deployment? Which sources should the agent read, and who should be allowed to direct it?</li>
 </ul>
 
 ## References & Further Reading

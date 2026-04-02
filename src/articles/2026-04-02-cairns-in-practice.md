@@ -77,6 +77,10 @@ The combination of on-demand generation, reader feedback, and source-of-truth li
 
 :::
 
+### A Note on Trust
+
+Which sources the agent reads, who can request content, and what gets published — these are trust decisions that belong to the deployer, not to Cairns. Every deployment defines its own boundaries: scoped API keys, read-only defaults, PR review gates, content scope limits. LLM security is an active area of research, and operating an agent that reads from multiple sources and publishes to a shared surface carries real risks that deployers assume responsibility for. See [The Feedback Loop](/articles/cairns-feedback-loop/) for a deeper discussion of trust boundaries.
+
 ## Making It Yours
 
 <span class="newthought">Cairns is a template,</span> not a product. The first thing you should do after cloning is customize:
