@@ -17,7 +17,7 @@ featured: true
 audience: [technical, business]
 trail: "What Is Cairns?"
 trailOrder: 1
-trailDescription: "A three-part introduction to the agent-powered knowledge trail system — what it solves, how it's built, and how to put it to work."
+trailDescription: "An introduction to the agent-powered knowledge trail system — what it solves, how it's built, and how to put it to work."
 related: [the-quiet-teammate]
 ---
 
