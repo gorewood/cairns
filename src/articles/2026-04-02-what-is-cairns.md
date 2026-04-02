@@ -7,10 +7,11 @@ submitter: Agent
 duration: 12
 status: published
 lead: >
-  Your team's best thinking is scattered across Slack threads, wiki stubs,
-  and the heads of people who are too busy to write it down.
-  Cairns is a static knowledge base that an AI agent writes, publishes,
-  and maintains — so the knowledge accumulates instead of evaporating.
+  Your team's best thinking is scattered across Slack threads, Notion pages,
+  repo READMEs, and the heads of people too busy to write it down.
+  Cairns is a knowledge hub where an AI agent pulls from all of those sources,
+  synthesizes what it finds, and publishes articles anyone on the team can read —
+  a first stop that ties together everywhere your team works.
 permalink: /articles/what-is-cairns/
 featured: true
 audience: [technical, business]
@@ -19,50 +20,50 @@ related: [the-quiet-teammate]
 
 ## The Problem Cairns Solves
 
-<span class="newthought">Every team generates more knowledge</span> than it captures. Decisions happen in meetings. Patterns emerge in code review. Hard-won lessons live in someone's head until they leave, and then they're gone.
+<span class="newthought">Every team generates more knowledge</span> than it captures — and what it does capture gets scattered everywhere. A decision lands in a Slack thread. The implementation detail lives in a repo README. The business context is in a Notion page. The rationale is in someone's head.
 <label for="sn-1" class="margin-toggle sidenote-number"></label>
 <input type="checkbox" id="sn-1" class="margin-toggle"/>
 <span class="sidenote">The term "cairn" comes from the Scottish Gaelic <em>càrn</em> — a stack of stones left on a trail to mark the way for those who follow. Hikers have used them for thousands of years.</span>
 
-Traditional documentation tools don't solve this because they depend on humans volunteering to write, and humans are busy. Wikis rot. READMEs drift. Confluence pages accumulate like sediment — layered, undated, contradictory.
+Getting the full picture on anything means hunting through five different tools, most of which require access permissions that adjacent teams don't have. New hires, stakeholders, and future-you all face the same problem: the knowledge exists, but nobody can find it without already knowing where to look.
 
 ```mermaid
 graph LR
-    A[Knowledge created] --> B{Captured?}
-    B -->|No| C[Lost forever]
-    B -->|Wiki| D[Written once]
-    D --> E[Drifts from reality]
-    E --> C
-    B -->|Cairns| F[Agent writes it]
-    F --> G[Agent maintains it]
-    G --> H[Team reads it]
+    S[Slack] --> A[Agent]
+    N[Notion] --> A
+    R[Repos] --> A
+    D[Docs] --> A
+    A --> C[Cairns]
+    C --> T[Team reads]
+    T -->|Feedback| A
 ```
 
 ::: callout key
 
-The core insight: **an AI agent can do the writing.** It can research, draft, format, publish, and — critically — come back and update articles when the underlying reality changes. Humans review, discuss, and steer. The agent does the labor.
+The core insight: **an AI agent can do the synthesis.** It reads across every source your team uses, distills what it finds into well-structured articles written for learning, links back to the source of truth for deeper dives — and comes back to update when things change. Humans review, discuss, and steer. The agent does the labor.
 
 :::
 
 ## How It Works
 
-<span class="newthought">Cairns is a static site</span> built with [Eleventy](https://www.11ty.dev/). Articles are markdown files with YAML frontmatter. The build pipeline compiles them into a styled, searchable website with zero runtime dependencies.
+<span class="newthought">Cairns is a static site</span> built with [Eleventy](https://www.11ty.dev/). Articles are markdown files with YAML frontmatter. The build pipeline compiles them into a styled, searchable website with zero runtime dependencies — the kind of site you can hand to anyone on the team without worrying about access controls or onboarding to yet another tool.
 
 The architecture is deliberately simple:
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
+| Sources | Repos, Notion, Slack, docs | Agent reads from these |
 | Content | Markdown + frontmatter | Agent writes here |
 | Build | Eleventy 3.x | Compiles to static HTML |
 | Search | Pagefind | Build-time full-text index |
 | Styling | Custom CSS | Dark/light mode, responsive |
 | Agent | OpenClaw skill | Teaches the format + workflow |
 
-The agent learns the content format from a **skill file** — a structured markdown document that describes the article template, frontmatter fields, markdown extensions, and publication workflow. Drop the skill into your agent's skill directory and it knows how to operate the entire system.
+The agent learns the content format from a **skill file** — a structured markdown document that describes the article template, frontmatter fields, markdown extensions, and publication workflow. Drop the skill into your agent's skill directory and it knows how to operate the entire system. Give it access to your team's knowledge sources and it does the synthesis work that nobody has time for.
 
 ::: callout def
 
-**Skill file** — a markdown document that teaches an AI agent a specific capability. It describes *what* the agent should do, *how* to do it, and *what good looks like*. In Cairns, the skill file at `skill/cairns/SKILL.md` contains the complete operating manual.
+**Skill file** — a markdown document that teaches an AI agent a specific capability. It describes *what* the agent should do, *how* to do it, and *what good looks like*. In Cairns, the skill file at `skill/cairns/SKILL.md` contains the complete operating manual for the knowledge base.
 
 :::
 
@@ -228,6 +229,29 @@ Start with weekly article generation and monthly maintenance sweeps. Increase ca
 
 :::
 
+## The Feedback Loop
+
+<span class="newthought">A knowledge base that can't be corrected</span> is just a slower way to be wrong. Cairns is designed for a tight loop between readers and the curation agent.
+
+<div class="scenario">
+<div class="scenario-header">Example: Reader feedback drives correction</div>
+<div class="slack-msg"><span class="sender human">@Dana</span> The cairn on API versioning says we use URL-path versioning, but we switched to header-based last quarter.</div>
+<div class="slack-msg"><span class="sender bot">@CairnsAgent</span> Checked the API gateway config — you're right, <code>Accept-Version</code> header routing was added in March. Updating the article now.</div>
+<div class="slack-msg"><span class="sender bot">@CairnsAgent</span> Done. Updated "API Versioning Without the Grief" — corrected the versioning strategy section, added a note about the migration. <a href="#">View diff</a></div>
+</div>
+
+This works because the agent has access to the same sources it originally drew from. It doesn't just accept the correction on faith — it *verifies*, then updates with evidence. The annotation system (optional) also lets readers flag issues directly from the article, creating GitHub issues the agent can triage.
+
+### On-Demand Content
+
+Beyond scheduled articles, anyone on the team can ask the agent to produce a new cairn on a specific topic. Need to onboard someone to the billing system? Ask the agent. Want a synthesis of the three different authentication approaches your team has debated? Ask the agent. It researches, drafts, and publishes — and the result is a permanent, linkable, searchable article, not a chat message that vanishes.
+
+::: callout key
+
+The combination of on-demand generation, reader feedback, and source-of-truth linking makes Cairns less like a wiki and more like a **knowledge concierge** — a first stop that can surface what any part of the organization knows, written for people who weren't in the room when it happened.
+
+:::
+
 ## Making It Yours
 
 <span class="newthought">Cairns is a template,</span> not a product. The first thing you should do after cloning is customize:
@@ -256,19 +280,19 @@ No server runtime. No database. No API keys for the reader-facing site.
 ## Summary
 
 <ol class="summary-list">
-<li><strong>Agent-written documentation</strong> — the AI does the research, writing, and maintenance. Humans review and steer.</li>
-<li><strong>Static and portable</strong> — Eleventy compiles markdown to HTML. No server, no database, deploy anywhere.</li>
-<li><strong>Skill-driven</strong> — a single SKILL.md file teaches any agent the content format, publication workflow, and maintenance routines.</li>
-<li><strong>Rich content primitives</strong> — callout boxes, scenario blocks, sidenotes, Mermaid diagrams, syntax highlighting, and more.</li>
-<li><strong>Self-maintaining</strong> — scheduled freshness checks, link audits, and tag cleanup keep the knowledge base healthy over time.</li>
+<li><strong>Multi-source knowledge hub</strong> — the agent pulls from repos, Notion, Slack, docs, and anywhere else your team works. One place to find what you need.</li>
+<li><strong>Written for learning</strong> — bite-sized articles with structured sections, callouts, diagrams, and scenarios. Not reference dumps — actual teaching.</li>
+<li><strong>Links to source of truth</strong> — every article can point back to the authoritative source for deeper dives. Cairns is the first stop, not the only stop.</li>
+<li><strong>Feedback-driven</strong> — readers tell the agent what's wrong, the agent verifies and corrects. On-demand content fills gaps when they're discovered.</li>
+<li><strong>Self-maintaining</strong> — scheduled freshness checks, link audits, and source drift detection keep the knowledge base honest over time.</li>
 </ol>
 
 ## Discussion Prompts
 
 <ul class="discussion-prompts">
-<li>What knowledge keeps getting rediscovered on your team? What would change if it were written down once and kept current?</li>
-<li>How much time does your team spend answering questions that should be documented? What's the compound cost over a quarter?</li>
-<li>What's the minimum viable knowledge base — which three topics would produce the most value if they were always up to date?</li>
+<li>What knowledge do people outside your team's core tools struggle to access? What would change if it were surfaced in one readable place?</li>
+<li>If you could ask an agent to synthesize any topic from your team's scattered sources right now, what would you ask for first?</li>
+<li>What's the minimum viable knowledge base — which three topics would onboard a new hire fastest if they were always up to date?</li>
 </ul>
 
 ## References & Further Reading
