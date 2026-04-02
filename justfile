@@ -1,5 +1,16 @@
 # Cairns — agent-powered knowledge trail system
 
+# ── Combined Build (for deployment) ──
+
+# Build both sites and combine for Pages deployment
+deploy-build:
+    npm run build
+    cd site && npm run build
+    rm -rf _combined
+    mkdir -p _combined
+    cp -r _site/* _combined/
+    cp -r site/_site/* _combined/
+
 # ── Marketing Site ──
 
 # Preview marketing site locally
@@ -22,4 +33,4 @@ serve:
 
 # Clean build output
 clean:
-    npm run clean
+    rm -rf _site _combined site/_site
