@@ -1,0 +1,699 @@
+---
+permalink: /index.html
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cairns — Agent-powered knowledge trail system</title>
+    <meta name="description" content="An agent-powered knowledge trail system. Your AI researches, writes, and maintains a living knowledge base.">
+    <meta property="og:title" content="Cairns — Knowledge Trail System">
+    <meta property="og:description" content="Your agents know the answers. Cairns makes sure the team does too.">
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    sans: ['Inter', 'system-ui', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'Consolas', 'monospace'],
+                },
+                colors: {
+                    cairn: {
+                        bg: '#0c0c14',
+                        card: '#14141f',
+                        'card-alt': '#1a1a28',
+                        border: '#1e1e2e',
+                        'border-light': '#2a2a3a',
+                        text: '#c0c0cc',
+                        muted: '#6a6a7a',
+                        bright: '#e8e8f0',
+                        accent: '#7c5cfc',
+                        'accent-dim': '#5a3fd4',
+                    }
+                }
+            }
+        }
+    }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        ::selection { background: rgba(124, 92, 252, 0.3); }
+
+        body {
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(124, 92, 252, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 40%, rgba(124, 92, 252, 0.02) 0%, transparent 40%),
+                #0c0c14;
+        }
+
+        /* Hide elements before GSAP animates them */
+        .gs { opacity: 0; }
+
+        /* Subtle glow on accent words */
+        .accent-glow {
+            text-shadow: 0 0 30px rgba(124, 92, 252, 0.3), 0 0 60px rgba(124, 92, 252, 0.1);
+        }
+
+        /* Terminal chrome */
+        .terminal {
+            background: #111118;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: rgba(20, 20, 31, 0.6);
+            border-bottom: 1px solid #1e1e2e;
+        }
+        .terminal-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-body {
+            padding: 20px 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            text-align: left;
+            overflow-x: hidden;
+        }
+        .terminal-body .prompt { color: #6a6a7a; }
+        .terminal-body .cmd { color: #e8e8f0; }
+        .terminal-body .key { color: #7c5cfc; }
+        .terminal-body .flag { color: #60a5fa; }
+        .terminal-body .str { color: #34d399; }
+        .terminal-body .cont { color: #2a2a3a; }
+        .terminal-body .cmt { color: #6a6a7a; font-style: italic; }
+
+        /* Copy button */
+        .copy-btn {
+            margin-left: auto;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            color: #6a6a7a;
+            background: rgba(30, 30, 46, 0.6);
+            border: 1px solid #2a2a3a;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover { color: #c0c0cc; border-color: #7c5cfc; }
+
+        /* Scroll indicator bounce */
+        @keyframes gentle-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(6px); }
+        }
+        .scroll-indicator { animation: gentle-bounce 2s ease-in-out infinite; }
+    </style>
+</head>
+
+<body class="text-cairn-text font-sans antialiased">
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav id="nav" class="fixed top-0 w-full z-50 transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2 font-mono font-bold text-lg text-cairn-bright tracking-tight">
+            <svg class="w-5 h-5 text-cairn-accent" xmlns="http://www.w3.org/2000/svg" viewBox="22 34 160 160" fill="currentColor" aria-hidden="true"><defs><mask id="gaps"><rect x="0" y="0" width="200" height="200" fill="white"/><ellipse cx="102" cy="62" rx="28" ry="4.4" fill="black"/><ellipse cx="97" cy="90" rx="44" ry="4.4" fill="black"/><ellipse cx="94" cy="120" rx="55" ry="4.4" fill="black"/><ellipse cx="99" cy="152" rx="64" ry="4.4" fill="black"/></mask></defs><g mask="url(#gaps)"><ellipse cx="104" cy="49" rx="17" ry="11"/><ellipse cx="96" cy="75" rx="32" ry="14"/><ellipse cx="102" cy="105" rx="47" ry="16"/><ellipse cx="93" cy="137" rx="54" ry="17"/><ellipse cx="100" cy="170" rx="66" ry="20"/></g></svg>
+            Cairns
+        </a>
+        <div class="hidden md:flex items-center gap-8 text-sm text-cairn-muted">
+            <a href="#features" class="hover:text-cairn-bright transition-colors">Features</a>
+            <a href="#agents" class="hover:text-cairn-bright transition-colors">Agents</a>
+            <a href="https://github.com/gorewood/cairns" class="flex items-center gap-1.5 hover:text-cairn-bright transition-colors" target="_blank" rel="noopener">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+            </a>
+        </div>
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-btn" class="md:hidden text-cairn-muted hover:text-cairn-bright transition-colors">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-cairn-border bg-cairn-bg/95 backdrop-blur-xl">
+        <div class="px-6 py-4 flex flex-col gap-4 text-sm text-cairn-muted">
+            <a href="#features" class="hover:text-cairn-bright transition-colors">Features</a>
+            <a href="#agents" class="hover:text-cairn-bright transition-colors">Agents</a>
+            <a href="https://github.com/gorewood/cairns" class="hover:text-cairn-bright transition-colors" target="_blank" rel="noopener">GitHub</a>
+        </div>
+    </div>
+</nav>
+
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="relative min-h-screen flex items-center justify-center pt-20 pb-32 overflow-hidden">
+    <!-- Background orb -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-cairn-accent/[0.06] rounded-full blur-[140px] pointer-events-none"></div>
+
+    <div class="relative max-w-4xl mx-auto px-6 text-center">
+        <!-- Badge -->
+        <div class="gs hero-badge inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-cairn-border bg-cairn-card/60 text-xs text-cairn-muted font-medium mb-8">
+            <span class="w-1.5 h-1.5 rounded-full bg-cairn-accent"></span>
+            Open Source &middot; MIT &middot; Eleventy
+        </div>
+
+        <!-- Headline -->
+        <h1 class="gs hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-cairn-bright leading-[1.1] tracking-tight mb-6">
+            Your agents know the answers.<br>
+            <span class="text-cairn-accent accent-glow">Cairns</span> makes sure the team does too.
+        </h1>
+
+        <!-- Subhead -->
+        <p class="gs hero-sub text-lg md:text-xl text-cairn-muted max-w-2xl mx-auto leading-relaxed mb-10">
+            An agent-powered knowledge trail system.
+            Your AI researches, writes, and maintains a living knowledge base &mdash;
+            so tribal knowledge stops dying in Slack threads.
+        </p>
+
+        <!-- CTAs -->
+        <div class="gs hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-14">
+            <a href="https://github.com/gorewood/cairns#readme"
+               class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-cairn-accent text-white font-semibold text-sm hover:bg-cairn-accent-dim transition-colors">
+                Get Started
+            </a>
+            <a href="https://github.com/gorewood/cairns"
+               class="inline-flex items-center justify-center px-6 py-3 rounded-lg border border-cairn-border-light text-cairn-text font-medium text-sm hover:border-cairn-muted hover:text-cairn-bright transition-colors" target="_blank" rel="noopener">
+                View on GitHub &rarr;
+            </a>
+        </div>
+
+        <!-- Install terminal -->
+        <div class="gs hero-terminal mx-auto max-w-2xl">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot bg-[#ff5f57]"></span>
+                    <span class="terminal-dot bg-[#febc2e]"></span>
+                    <span class="terminal-dot bg-[#28c840]"></span>
+                    <button class="copy-btn" onclick="copyCmd(this, 'git clone https://github.com/gorewood/cairns && cd cairns && npm install')">Copy</button>
+                </div>
+                <div class="terminal-body"><span class="prompt">$</span> <span class="cmd">git clone</span> <span class="str">https://github.com/gorewood/cairns</span>
+<span class="prompt">$</span> <span class="cmd">cd</span> cairns <span class="cmd">&amp;&amp;</span> <span class="cmd">npm install</span>
+<span class="prompt">$</span> <span class="cmd">npm run build</span>
+<span class="cmt"># Eleventy builds articles &rarr; Pagefind indexes them &rarr; static site ready</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 scroll-indicator">
+        <svg class="w-5 h-5 text-cairn-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     PROBLEM
+     ============================================================ -->
+<section class="relative py-24 md:py-32">
+    <div class="max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">The Problem</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-16 leading-tight">
+            Knowledge vanishes. Every day.
+        </h2>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Card 1 -->
+            <div class="gs problem-card rounded-xl border border-cairn-border bg-cairn-card/30 p-8">
+                <div class="w-10 h-10 rounded-lg bg-cairn-accent/10 flex items-center justify-center mb-5">
+                    <svg class="w-5 h-5 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-cairn-bright mb-3">Slack threads bury context</h3>
+                <p class="text-cairn-muted leading-relaxed">Decisions get made in threads, DMs, and standups. A week later, nobody can find them. A month later, nobody remembers them.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="gs problem-card rounded-xl border border-cairn-border bg-cairn-card/30 p-8">
+                <div class="w-10 h-10 rounded-lg bg-cairn-accent/10 flex items-center justify-center mb-5">
+                    <svg class="w-5 h-5 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-cairn-bright mb-3">Wiki pages rot</h3>
+                <p class="text-cairn-muted leading-relaxed">Documentation gets written once, then drifts. Nobody owns the update cycle. Stale docs are worse than no docs.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="gs problem-card rounded-xl border border-cairn-border bg-cairn-card/30 p-8">
+                <div class="w-10 h-10 rounded-lg bg-cairn-accent/10 flex items-center justify-center mb-5">
+                    <svg class="w-5 h-5 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
+                </div>
+                <h3 class="text-lg font-semibold text-cairn-bright mb-3">New hires start from zero</h3>
+                <p class="text-cairn-muted leading-relaxed">Tribal knowledge lives in people's heads. When they're busy, context is bottlenecked. When they leave, it's gone.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     SOLUTION — the agent writes it
+     ============================================================ -->
+<section class="relative py-24 md:py-32">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cairn-border to-transparent"></div>
+
+    <div class="max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">The Solution</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-6 leading-tight">
+            Teach your agent. It writes the rest.
+        </h2>
+        <p class="gs text-cairn-muted text-center max-w-xl mx-auto mb-14">
+            Give your agent a skill file. It learns the content format, researches topics, writes articles, and maintains freshness &mdash; autonomously.
+        </p>
+
+        <div class="gs max-w-3xl mx-auto">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot bg-[#ff5f57]"></span>
+                    <span class="terminal-dot bg-[#febc2e]"></span>
+                    <span class="terminal-dot bg-[#28c840]"></span>
+                    <span class="ml-3 text-xs text-cairn-muted font-mono">src/articles/2026-04-02-api-versioning.md</span>
+                </div>
+                <div class="terminal-body"><span class="flag">---</span>
+<span class="key">title</span>: <span class="str">"API Versioning Without the Grief"</span>
+<span class="key">subtitle</span>: <span class="str">"Three strategies, one clear winner for your stack"</span>
+<span class="key">date</span>: <span class="cmd">2026-04-02</span>
+<span class="key">tags</span>: <span class="cmd">[api, architecture, patterns]</span>
+<span class="key">submitter</span>: <span class="cmd">Agent</span>
+<span class="key">duration</span>: <span class="cmd">14</span>
+<span class="key">status</span>: <span class="cmd">published</span>
+<span class="key">lead</span>: <span class="cmd">></span>
+  <span class="str">URL-path versioning feels natural until you have
+  thirty endpoints and a mobile client on v2...</span>
+<span class="flag">---</span>
+
+<span class="cmt"># Agent researches, writes markdown, builds the site.</span>
+<span class="cmt"># Articles auto-appear in trailhead, library, archives, and tag pages.</span></div>
+            </div>
+        </div>
+
+        <!-- Three-column concept callout -->
+        <div class="grid grid-cols-3 gap-8 mt-16 max-w-3xl mx-auto">
+            <div class="gs text-center">
+                <p class="text-2xl font-bold text-cairn-accent font-mono mb-2">cairn</p>
+                <p class="text-sm text-cairn-muted">A single knowledge article. Self-contained, well-researched.</p>
+            </div>
+            <div class="gs text-center">
+                <p class="text-2xl font-bold text-cairn-bright font-mono mb-2">trail</p>
+                <p class="text-sm text-cairn-muted">A multi-part series. Linked with prev/next navigation.</p>
+            </div>
+            <div class="gs text-center">
+                <p class="text-2xl font-bold text-cairn-bright font-mono mb-2">trailhead</p>
+                <p class="text-sm text-cairn-muted">The homepage. Trails, featured articles, recent entries.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section id="features" class="relative py-24 md:py-32">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cairn-border to-transparent"></div>
+
+    <div class="max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">Features</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-6 leading-tight">
+            Built for reading. Designed for agents.
+        </h2>
+        <p class="gs text-cairn-muted text-center max-w-lg mx-auto mb-14">
+            The output is a polished static site your team will actually want to read. The input is markdown your agent already knows how to write.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <!-- Trails -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Trails</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">Multi-part series with automatic prev/next navigation. Group deep dives into coherent learning paths.</p>
+            </div>
+
+            <!-- Callout Boxes -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Rich callouts</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">Key takeaways, tips, warnings, and definitions. Color-coded containers your agent writes in markdown.</p>
+            </div>
+
+            <!-- Search -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Pagefind search</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">Full-text static search built at compile time. No server needed. Find any concept across all articles instantly.</p>
+            </div>
+
+            <!-- Dark/Light Mode -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Dark &amp; light mode</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">System preference detection with manual override. Smooth transitions. Persisted in localStorage.</p>
+            </div>
+
+            <!-- Tag Organization -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path d="M6 6h.008v.008H6V6z"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Auto-organized tags</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">Tag your articles in frontmatter. Library view, tag index pages, and archive pages generate automatically.</p>
+            </div>
+
+            <!-- Section Animations -->
+            <div class="gs feature-card rounded-xl border border-cairn-border bg-cairn-card/30 p-6">
+                <div class="w-8 h-8 rounded-md bg-cairn-accent/10 flex items-center justify-center mb-4">
+                    <svg class="w-4 h-4 text-cairn-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/></svg>
+                </div>
+                <h3 class="text-base font-semibold text-cairn-bright mb-2">Scroll animations</h3>
+                <p class="text-sm text-cairn-muted leading-relaxed">Sections fade in as you scroll. Progress bar tracks reading position. Respects reduced-motion preferences.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     PHILOSOPHY — wiki vs agent-maintained
+     ============================================================ -->
+<section class="relative py-24 md:py-32">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cairn-border to-transparent"></div>
+
+    <div class="max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">Philosophy</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-16 leading-tight">
+            Documentation that maintains itself.
+        </h2>
+
+        <div class="gs max-w-4xl mx-auto grid md:grid-cols-2 gap-0 rounded-xl border border-cairn-border overflow-hidden">
+            <!-- Left: Traditional wiki -->
+            <div class="p-8 md:p-10 bg-cairn-card/20 border-b md:border-b-0 md:border-r border-cairn-border">
+                <p class="text-xs font-semibold tracking-[0.15em] text-cairn-muted uppercase mb-6">Traditional wiki</p>
+                <ul class="space-y-4 text-sm text-cairn-muted">
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-border-light mt-0.5">&#9679;</span>
+                        Someone writes it once, nobody updates it
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-border-light mt-0.5">&#9679;</span>
+                        Pages drift from reality within weeks
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-border-light mt-0.5">&#9679;</span>
+                        Ownership is everyone's &mdash; meaning no one's
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-border-light mt-0.5">&#9679;</span>
+                        Format varies wildly between authors
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Right: Cairns -->
+            <div class="p-8 md:p-10 bg-cairn-card/40">
+                <p class="text-xs font-semibold tracking-[0.15em] text-cairn-accent/80 uppercase mb-6">Cairns</p>
+                <ul class="space-y-4 text-sm text-cairn-text">
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-accent mt-0.5">&#9679;</span>
+                        Agent writes, agent maintains, agent updates
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-accent mt-0.5">&#9679;</span>
+                        Freshness checks detect drift automatically
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-accent mt-0.5">&#9679;</span>
+                        One skill file defines consistent quality
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-cairn-accent mt-0.5">&#9679;</span>
+                        Every article follows the same structure
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="gs text-center text-cairn-muted mt-12 text-lg italic">
+            The agent doesn't just write docs. It keeps them true.
+        </p>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     AGENT INTEGRATION
+     ============================================================ -->
+<section id="agents" class="relative py-24 md:py-32">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cairn-border to-transparent"></div>
+
+    <div class="max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">Integrations</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-6 leading-tight">
+            Works with any agent.
+        </h2>
+        <p class="gs text-cairn-muted text-center max-w-lg mx-auto mb-12">
+            The OpenClaw skill teaches your agent everything: content format, publication workflow, and maintenance routines. Integration with other agent frameworks is an exercise left to the reader.
+        </p>
+
+        <!-- Agent badges -->
+        <div class="gs flex flex-wrap justify-center gap-3 mb-14">
+            <span class="px-4 py-2 rounded-lg border border-cairn-accent/40 bg-cairn-accent/10 text-sm text-cairn-bright font-medium">OpenClaw</span>
+            <span class="px-4 py-2 rounded-lg border border-cairn-border bg-cairn-card/40 text-sm text-cairn-text">Claude Code</span>
+            <span class="px-4 py-2 rounded-lg border border-cairn-border bg-cairn-card/40 text-sm text-cairn-muted">Gemini CLI</span>
+            <span class="px-4 py-2 rounded-lg border border-cairn-border bg-cairn-card/40 text-sm text-cairn-muted">Cursor</span>
+            <span class="px-4 py-2 rounded-lg border border-cairn-border/60 bg-transparent text-sm text-cairn-muted italic">any CLI agent</span>
+        </div>
+
+        <!-- Skill snippet -->
+        <div class="gs max-w-2xl mx-auto">
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot bg-[#ff5f57]"></span>
+                    <span class="terminal-dot bg-[#febc2e]"></span>
+                    <span class="terminal-dot bg-[#28c840]"></span>
+                    <span class="ml-3 text-xs text-cairn-muted font-mono">skill/cairns/SKILL.md</span>
+                </div>
+                <div class="terminal-body text-cairn-muted">
+<span class="cmt"># The skill file teaches your agent:</span>
+
+<span class="key">1.</span> <span class="cmd">Research</span> &mdash; web search, source code, internal docs
+<span class="key">2.</span> <span class="cmd">Write</span> &mdash; markdown with callouts, scenarios, diagrams
+<span class="key">3.</span> <span class="cmd">Publish</span> &mdash; build, verify, commit, push
+<span class="key">4.</span> <span class="cmd">Maintain</span> &mdash; freshness checks, broken links, tag cleanup
+
+<span class="cmt"># Drop skill/cairns/ into your agent's skill directory.</span>
+<span class="cmt"># It handles the rest.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     QUICK START
+     ============================================================ -->
+<section class="relative py-24 md:py-32">
+    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cairn-border to-transparent"></div>
+    <!-- Background orb -->
+    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-cairn-accent/[0.04] rounded-full blur-[120px] pointer-events-none"></div>
+
+    <div class="relative max-w-6xl mx-auto px-6">
+        <p class="gs text-xs font-semibold tracking-[0.2em] text-cairn-accent/80 uppercase mb-4 text-center">Get Started</p>
+        <h2 class="gs text-3xl md:text-4xl font-bold text-cairn-bright text-center mb-16 leading-tight">
+            Three steps to your first cairn.
+        </h2>
+
+        <div class="max-w-4xl mx-auto space-y-6 text-left">
+            <!-- Step 1 -->
+            <div class="gs step flex gap-6">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-cairn-accent/10 border border-cairn-accent/20 flex items-center justify-center text-cairn-accent font-bold text-sm font-mono">1</div>
+                <div class="flex-1">
+                    <p class="text-cairn-bright font-semibold mb-3">Clone and install</p>
+                    <div class="terminal">
+                        <div class="terminal-body py-3"><span class="prompt">$</span> <span class="cmd">git clone</span> <span class="str">https://github.com/gorewood/cairns</span>
+<span class="prompt">$</span> <span class="cmd">cd</span> cairns <span class="cmd">&amp;&amp;</span> <span class="cmd">npm install</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="gs step flex gap-6">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-cairn-accent/10 border border-cairn-accent/20 flex items-center justify-center text-cairn-accent font-bold text-sm font-mono">2</div>
+                <div class="flex-1">
+                    <p class="text-cairn-bright font-semibold mb-1">Customize for your team</p>
+                    <p class="text-cairn-muted text-sm mb-3">Edit the guide page, site config, and tag vocabulary to match your team's domain.</p>
+                    <div class="terminal">
+                        <div class="terminal-body py-3"><span class="cmt"># Your team's identity</span>
+<span class="prompt">$</span> <span class="cmd">$EDITOR</span> <span class="str">src/_data/site.json</span>    <span class="cmt"># title, description, url</span>
+<span class="prompt">$</span> <span class="cmd">$EDITOR</span> <span class="str">src/guide.md</span>            <span class="cmt"># how your team uses Cairns</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="gs step flex gap-6">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-cairn-accent/10 border border-cairn-accent/20 flex items-center justify-center text-cairn-accent font-bold text-sm font-mono">3</div>
+                <div class="flex-1">
+                    <p class="text-cairn-bright font-semibold mb-1">Teach your agent</p>
+                    <p class="text-cairn-muted text-sm mb-3">Point your agent at the skill directory. It learns the format and starts writing.</p>
+                    <div class="terminal">
+                        <div class="terminal-body py-3"><span class="cmt"># The skill/ directory contains everything the agent needs.</span>
+<span class="cmt"># Copy it into your agent's skill path, or reference it directly.</span>
+<span class="prompt">$</span> <span class="cmd">ls</span> <span class="str">skill/cairns/</span>
+<span class="cmd">SKILL.md</span>  <span class="cmd">references/</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="gs text-center mt-14">
+            <a href="https://github.com/gorewood/cairns#readme"
+               class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-cairn-accent text-white font-semibold text-sm hover:bg-cairn-accent-dim transition-colors">
+                Read the guide &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="relative py-16 border-t border-cairn-border/50">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-6">
+                <span class="font-mono font-bold text-cairn-bright">Cairns</span>
+                <span class="text-xs text-cairn-muted">MIT License</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm text-cairn-muted">
+                <a href="https://github.com/gorewood/cairns" class="hover:text-cairn-text transition-colors">GitHub</a>
+                <a href="https://github.com/gorewood/cairns#readme" class="hover:text-cairn-text transition-colors">Docs</a>
+            </div>
+        </div>
+        <p class="text-center text-xs text-cairn-muted/60 mt-8">
+            Simple tools for knowledge that lasts.
+        </p>
+    </div>
+</footer>
+
+
+<!-- ============================================================
+     SCRIPTS — GSAP + ScrollTrigger
+     ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"></script>
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ---- Hero entrance animations ----
+    const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    heroTl
+        .to('.hero-badge', { opacity: 1, y: 0, duration: 0.6 }, 0.1)
+        .fromTo('.hero-badge', { y: 20 }, { y: 0 }, 0.1)
+        .to('.hero-title', { opacity: 1, duration: 0.7 }, 0.25)
+        .fromTo('.hero-title', { y: 30 }, { y: 0, ease: 'power3.out' }, 0.25)
+        .to('.hero-sub', { opacity: 1, duration: 0.6 }, 0.5)
+        .fromTo('.hero-sub', { y: 20 }, { y: 0 }, 0.5)
+        .to('.hero-cta', { opacity: 1, duration: 0.5 }, 0.65)
+        .fromTo('.hero-cta', { y: 15 }, { y: 0 }, 0.65)
+        .to('.hero-terminal', { opacity: 1, duration: 0.8 }, 0.8)
+        .fromTo('.hero-terminal', { y: 25, scale: 0.98 }, { y: 0, scale: 1 }, 0.8);
+
+    // ---- Scroll-triggered reveals ----
+    const revealElements = gsap.utils.toArray('.gs:not(.hero-badge):not(.hero-title):not(.hero-sub):not(.hero-cta):not(.hero-terminal)');
+    revealElements.forEach(el => {
+        gsap.to(el, {
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+        });
+        gsap.set(el, { y: 30 });
+    });
+
+    // Staggered reveals for card groups
+    document.querySelectorAll('.problem-card, .feature-card, .step').forEach((el, i) => {
+        gsap.to(el, {
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+            },
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: (i % 3) * 0.12,
+            ease: 'power3.out',
+        });
+    });
+
+    // ---- Nav glassmorphism on scroll ----
+    const nav = document.getElementById('nav');
+    ScrollTrigger.create({
+        start: 50,
+        onUpdate: (self) => {
+            if (self.scroll() > 50) {
+                nav.classList.add('bg-cairn-bg/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/10');
+            } else {
+                nav.classList.remove('bg-cairn-bg/80', 'backdrop-blur-xl', 'shadow-lg', 'shadow-black/10');
+            }
+        }
+    });
+
+    // ---- Mobile menu toggle ----
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // ---- Copy command ----
+    function copyCmd(btn, cmd) {
+        navigator.clipboard.writeText(cmd).then(() => {
+            btn.textContent = 'Copied!';
+            btn.style.color = '#7c5cfc';
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.style.color = '';
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
