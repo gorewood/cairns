@@ -4,30 +4,8 @@
    Token classes are added at build time by markdown-it-prism.
    ============================================================ */
 
-/* ── Light Mode (default) ── */
-:root {
-  --code-bg: #f0ece6;
-  --code-fg: #1a1a2e;
-  --token-comment: #6a7a6a;
-  --token-keyword: #7c3aed;
-  --token-string: #0d7c66;
-  --token-number: #c74d1a;
-  --token-function: #2563eb;
-  --token-operator: #555;
-  --token-class: #b45309;
-  --token-punctuation: #666;
-  --token-property: #2563eb;
-  --token-builtin: #7c3aed;
-  --token-attr-name: #b45309;
-  --token-attr-value: #0d7c66;
-  --token-tag: #c74d1a;
-  --token-selector: #7c3aed;
-  --token-inserted: #0d7c66;
-  --token-deleted: #c74d1a;
-  --token-changed: #2563eb;
-}
-
-/* ── Dark Mode ── */
+/* ── Dark Mode (default, matches base.css) ── */
+:root,
 [data-theme="dark"] {
   --code-bg: #1a1a2e;
   --code-fg: #e0e0ec;
@@ -48,6 +26,29 @@
   --token-inserted: #6ee7b7;
   --token-deleted: #fb923c;
   --token-changed: #93c5fd;
+}
+
+/* ── Light Mode ── */
+[data-theme="light"] {
+  --code-bg: #f0ece6;
+  --code-fg: #1a1a2e;
+  --token-comment: #6a7a6a;
+  --token-keyword: #7c3aed;
+  --token-string: #0d7c66;
+  --token-number: #c74d1a;
+  --token-function: #2563eb;
+  --token-operator: #555;
+  --token-class: #b45309;
+  --token-punctuation: #666;
+  --token-property: #2563eb;
+  --token-builtin: #7c3aed;
+  --token-attr-name: #b45309;
+  --token-attr-value: #0d7c66;
+  --token-tag: #c74d1a;
+  --token-selector: #7c3aed;
+  --token-inserted: #0d7c66;
+  --token-deleted: #c74d1a;
+  --token-changed: #2563eb;
 }
 
 /* ── Code Blocks ── */
