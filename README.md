@@ -1,5 +1,7 @@
 # Cairns
 
+**[Marketing Site](https://gorewood.github.io/cairns/)** | **[Live Demo](https://gorewood.github.io/cairns/trailhead/)** | **[Example Trail](https://gorewood.github.io/cairns/articles/understanding-cairns/)**
+
 A static knowledge base designed to be **owned and operated by an AI agent**. The agent researches topics, writes long-form articles, publishes them, maintains quality, and processes reader feedback — all autonomously. Humans suggest topics, read articles, and annotate problems. The agent does everything else.
 
 **A cairn** is a stack of stones marking a trail — placed at forks, summits, and anywhere a traveler might lose the path. That's what this system produces: self-contained knowledge markers built by an agent to help the team navigate unfamiliar territory.
