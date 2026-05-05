@@ -1,4 +1,5 @@
 node_modules/
+.npm/
 _site/
 _combined/
 site/_site/

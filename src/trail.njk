@@ -1,0 +1,113 @@
+---
+layout: layouts/base.njk
+pageCss: index.css
+pagination:
+  data: collections.trailList
+  size: 1
+  alias: trail
+  addAllPagesToCollections: false
+permalink: "/trails/{{ trail.slug }}/"
+eleventyComputed:
+  title: "{{ trail.name }} — Trail"
+---
+<div class="layout" data-pagefind-ignore="all">
+
+  <!-- Left Sidebar: All trails -->
+  <aside class="sidebar-left">
+    <p class="label">Trails</p>
+    <p class="sublabel">Multi-Part Series</p>
+    <ul class="cat-list">
+      {% for t in collections.trailList %}
+      <li><a href="{{ ('/trails/' + t.slug + '/') | url }}" {% if t.slug == trail.slug %}class="active"{% endif %}>{{ t.name }}</a></li>
+      {% endfor %}
+    </ul>
+    <hr class="sidebar-sep"/>
+    <a href="{{ '/trails/' | url }}" class="sidebar-guide-link">All Trails &rarr;</a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <p class="trail-breadcrumb">
+      <a href="{{ '/trails/' | url }}">Trails</a>
+      <span class="trail-breadcrumb__sep">/</span>
+      <span>{{ trail.name }}</span>
+    </p>
+
+    <h1 class="trail-home__title">{{ trail.name }}</h1>
+
+    {% if trail.description %}
+    <p class="trail-home__desc">{{ trail.description }}</p>
+    {% endif %}
+
+    <div class="trail-home__meta">
+      <span>{{ trail.parts }} {% if trail.parts == 1 %}part{% else %}parts{% endif %}</span>
+      <span>~{{ trail.totalDuration }} min total</span>
+      {% for aud in trail.audiences %}
+      <span class="badge badge--audience">{{ aud }}</span>
+      {% endfor %}
+    </div>
+
+    {% if trail.articles | length %}
+    {% set firstArticle = trail.articles | first %}
+    <a href="{{ firstArticle.url | url }}" class="btn-primary trail-home__cta">Start the trail &rarr;</a>
+    {% endif %}
+
+    <hr class="trail-home__rule"/>
+
+    <p class="label">Parts</p>
+    <ol class="trail-parts">
+      {% for article in trail.articles %}
+      <li class="trail-part">
+        <div class="trail-part__num">Part {{ article.data.trailOrder }}</div>
+        <div class="trail-part__body">
+          <h3 class="trail-part__title"><a href="{{ article.url | url }}">{{ article.data.title }}</a></h3>
+          <p class="trail-part__subtitle">{{ article.data.subtitle }}</p>
+          <div class="trail-part__meta">
+            <span>{{ article.data.duration }} min</span>
+            {% if article.data.audience %}
+            {% for aud in article.data.audience %}
+            <span class="badge badge--audience">{{ aud }}</span>
+            {% endfor %}
+            {% endif %}
+            {% if article.data.status == "draft" %}
+            <span class="badge badge--draft">Draft</span>
+            {% endif %}
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="sidebar-right">
+    <p class="label">Trail Info</p>
+    <dl class="meta-table">
+      <dt>Parts</dt>
+      <dd>{{ trail.parts }}</dd>
+      <dt>Reading Time</dt>
+      <dd>~{{ trail.totalDuration }} min</dd>
+      <dt>Latest</dt>
+      <dd>{{ trail.latestDateISO | dateFormat }}</dd>
+    </dl>
+
+    {% if trail.contributors | length %}
+    <p class="label">Contributors</p>
+    <ul class="contrib-list">
+      {% for name in trail.contributors %}
+      <li>{{ name }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if trail.tags | length %}
+    <p class="label">Tags</p>
+    <div class="tag-pills">
+      {% for tag in trail.tags %}
+      <a href="{{ ('/tags/' + tag + '/') | url }}" class="tag-pill">{{ tag | tagDisplay }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </aside>
+
+</div>

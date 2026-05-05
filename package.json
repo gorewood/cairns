@@ -4,7 +4,7 @@
   "private": true,
   "description": "Agent-powered knowledge trail system",
   "scripts": {
-    "build": "npx @11ty/eleventy && npx pagefind --site _site",
+    "build": "npx @11ty/eleventy && npx pagefind --site _site && node scripts/version-pagefind-assets.js",
     "serve": "npx @11ty/eleventy --serve",
     "clean": "rm -rf _site"
   },
@@ -16,6 +16,6 @@
     "markdown-it-anchor": "^9.2.0",
     "markdown-it-container": "^4.0.0",
     "markdown-it-prism": "^3.0.1",
-    "pagefind": "^1.4.0"
+    "pagefind": "^1.5.2"
   }
 }

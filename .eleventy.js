@@ -108,7 +108,11 @@ module.exports = function (eleventyConfig) {
     return [...tagSet].sort();
   });
 
-  // Trails: group articles by trail name, sorted by trailOrder
+  // Slug helper used by trail collections
+  const slugifyTrail = (s) =>
+    (s || "").toLowerCase().replace(/[^\w]+/g, "-").replace(/(^-|-$)/g, "");
+
+  // Trails (object keyed by name): legacy shape consumed by article.njk for prev/next
   eleventyConfig.addCollection("trails", function (collectionApi) {
     const trails = {};
     collectionApi.getFilteredByTag("articles").forEach((item) => {
@@ -117,11 +121,70 @@ module.exports = function (eleventyConfig) {
       if (!trails[trail]) trails[trail] = [];
       trails[trail].push(item);
     });
-    // Sort each trail by order
     for (const name of Object.keys(trails)) {
       trails[name].sort((a, b) => (a.data.trailOrder || 0) - (b.data.trailOrder || 0));
     }
     return trails;
+  });
+
+  // trailList: array of trail objects with derived metadata, sorted by most-recent
+  // article date descending. Used for /trails/, per-trail pages, and "Latest Trails"
+  // on the trailhead.
+  eleventyConfig.addCollection("trailList", function (collectionApi) {
+    const trails = {};
+    collectionApi.getFilteredByTag("articles").forEach((item) => {
+      const trail = item.data.trail;
+      if (!trail) return;
+      if (!trails[trail]) trails[trail] = [];
+      trails[trail].push(item);
+    });
+    const out = [];
+    for (const name of Object.keys(trails)) {
+      const articles = trails[name].sort(
+        (a, b) => (a.data.trailOrder || 0) - (b.data.trailOrder || 0)
+      );
+      const descArticle = articles.find((a) => a.data.trailDescription);
+      const totalDuration = articles.reduce(
+        (s, a) => s + (a.data.duration || 0),
+        0
+      );
+      const latestDate = articles.reduce((d, a) => {
+        const ad = new Date(a.date);
+        return ad > d ? ad : d;
+      }, new Date(0));
+      const audiences = [
+        ...new Set(articles.flatMap((a) => a.data.audience || [])),
+      ];
+      const contributors = [
+        ...new Set(
+          articles
+            .flatMap((a) => [a.data.submitter, ...(a.data.contributors || [])])
+            .filter(Boolean)
+        ),
+      ];
+      const tags = [
+        ...new Set(
+          articles.flatMap((a) =>
+            (a.data.tags || []).filter((t) => t !== "articles")
+          )
+        ),
+      ];
+      out.push({
+        name,
+        slug: slugifyTrail(name),
+        description: descArticle ? descArticle.data.trailDescription : "",
+        articles,
+        parts: articles.length,
+        totalDuration,
+        latestDate,
+        latestDateISO: latestDate.toISOString(),
+        audiences,
+        contributors,
+        tags,
+      });
+    }
+    out.sort((a, b) => b.latestDate - a.latestDate);
+    return out;
   });
 
   // --- Filters ---

@@ -151,8 +151,10 @@ All long-form reports use **threaded delivery**: a short summary in the channel,
 ### Installing the Skill
 
 ```bash
-cp -r skill/cairns ~/.openclaw/skills/
+ln -sfn "$(pwd)/skill/cairns" ~/.openclaw/skills/cairns
 ```
+
+Prefer a symlink over a copied directory so repo updates are picked up automatically by any local skill path that points at Cairns.
 
 The skill teaches the agent the full content pipeline, markdown format, cron configurations, and all content components. See `skill/cairns/references/` for detailed documentation.
 

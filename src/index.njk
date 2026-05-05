@@ -29,37 +29,33 @@ permalink: /trailhead/
   <!-- Main Content -->
   <main class="main-content">
 
-    <!-- Featured Trails -->
-    {% if collections.trails | length %}
+    <!-- Latest Trails -->
+    {% if collections.trailList | length %}
     <div class="section-header">
-      <p class="label label--accent">Featured Trails</p>
-      {% if collections.trails | length > 1 %}
+      <p class="label label--accent">Latest Trails</p>
+      {% if collections.trailList | length > 1 %}
       <a href="{{ '/trails/' | url }}" class="section-header__cta">All Trails &rarr;</a>
       {% endif %}
     </div>
     <div class="trail-cards">
       {%- set trailCount = 0 -%}
-      {% for trailName, articles in collections.trails %}
+      {% for trail in collections.trailList %}
         {%- if trailCount < 3 -%}
-      <a href="{{ '/trails/' | url }}#trail-{{ trailName | slugify }}" class="trail-card">
-        <div class="trail-card__title">{{ trailName }}</div>
+      <a href="{{ ('/trails/' + trail.slug + '/') | url }}" class="trail-card">
+        <div class="trail-card__title">{{ trail.name }}</div>
         <div class="trail-card__meta">
-          {{ articles | length }} parts &middot;
-          {%- set totalDuration = 0 -%}
-          {%- for a in articles -%}{%- set totalDuration = totalDuration + a.data.duration -%}{%- endfor -%}
-          ~{{ totalDuration }} min
+          {{ trail.parts }} parts &middot; ~{{ trail.totalDuration }} min
         </div>
-        {% set firstArticle = articles | first %}
-        {% if firstArticle.data.trailDescription %}
-        <p class="trail-card__desc">{{ firstArticle.data.trailDescription }}</p>
+        {% if trail.description %}
+        <p class="trail-card__desc">{{ trail.description }}</p>
         {% endif %}
       </a>
         {%- set trailCount = trailCount + 1 -%}
         {%- endif -%}
       {% endfor %}
     </div>
-    {% if collections.trails | length > 3 %}
-    <a href="{{ '/trails/' | url }}" class="section-more-link">See all {{ collections.trails | length }} trails &rarr;</a>
+    {% if collections.trailList | length > 3 %}
+    <a href="{{ '/trails/' | url }}" class="section-more-link">See all {{ collections.trailList | length }} trails &rarr;</a>
     {% endif %}
     {% endif %}
 
@@ -151,7 +147,7 @@ permalink: /trailhead/
       <dt>Articles</dt>
       <dd>{{ collections.articles | length }}</dd>
       <dt>Trails</dt>
-      <dd>{{ collections.trails | length }}</dd>
+      <dd>{{ collections.trailList | length }}</dd>
       <dt>Status</dt>
       <dd>NOMINAL</dd>
     </dl>

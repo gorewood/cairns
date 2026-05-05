@@ -12,7 +12,7 @@ extraCss:
     <p class="guide-header__subtitle">{{ subtitle }}</p>
     {% endif %}
   </header>
-  <div class="guide-body">
+  <div class="guide-body" data-pagefind-body data-pagefind-meta="title:{{ title }}">
     {{ content | safe }}
   </div>
   <div class="colophon">

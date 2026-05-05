@@ -18,9 +18,9 @@
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `trail` | string | Series name. All parts of a series share this value. |
-| `trailOrder` | number | Position in the series (1-based). |
-| `trailDescription` | string | Brief description shown on trailhead trail card. Set on the first cairn in a trail. |
+| `trail` | string | Series name. All parts of a series share this value. The trail also gets a deep-linkable home page at `/trails/{slug}/` where `slug` is the trail name slugified. |
+| `trailOrder` | number | Position in the series (1-based, sequential, no gaps). **Required when `trail` is set** — drives ordering on the trail home page and prev/next navigation in the article layout. |
+| `trailDescription` | string | Brief description shown on the trail home page, the `/trails/` directory card, and the trailhead "Latest Trails" card. Set on the first cairn; the system falls back to the first part that has one if part 1 lacks it. |
 | `related` | array | File slugs of related cairns (without path or extension). |
 | `audience` | array | Audience badges rendered in subtitle and trail page. Values: `technical`, `business`, `operations`. |
 | `contributors` | array | Names of people who improved the article over time. |

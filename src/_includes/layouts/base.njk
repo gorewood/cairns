@@ -21,7 +21,7 @@
   {% if extraCss %}{% for css in extraCss %}<link rel="stylesheet" href="{{ '/css/' | url }}{{ css }}"/>
   {% endfor %}{% endif %}
   <link rel="stylesheet" href="{{ '/css/search.css' | url }}"/>
-  <link rel="stylesheet" href="{{ '/pagefind/pagefind-ui.css' | url }}"/>
+  <link rel="stylesheet" href="{{ pagefind.assetPath | url }}pagefind-ui.css"/>
 </head>
 <body>
   {% include "partials/header.njk" %}
@@ -36,14 +36,19 @@
       localStorage.setItem('cairns-theme', next);
     });
   </script>
-  <script src="{{ '/pagefind/pagefind-ui.js' | url }}"></script>
+  <script src="{{ pagefind.assetPath | url }}pagefind-ui.js"></script>
   <script>
     // Header search toggle
     (function() {
       var btn = document.getElementById('search-toggle');
       var overlay = document.getElementById('search-overlay');
       if (!btn || !overlay) return;
-      new PagefindUI({ element: "#search-overlay-inner", showSubResults: true, showImages: false });
+      new PagefindUI({
+        element: "#search-overlay-inner",
+        showSubResults: true,
+        showImages: false,
+        bundlePath: "{{ pagefind.assetPath | url }}"
+      });
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         var open = overlay.classList.toggle('search-overlay--open');

@@ -36,7 +36,8 @@ src/index.njk          ← Trailhead (trails → featured → recent)
 src/guide.md           ← How to use Cairns (customize for your team)
 src/library.njk        ← Tag-organized view
 src/archives.njk       ← Chronological view
-src/trails.njk         ← Trail landing page
+src/trails.njk         ← Trail directory (compact card list of all trails)
+src/trail.njk          ← Per-trail home page template, paginated as /trails/{slug}/
 _site/                 ← Build output (gitignored)
 ```
 
@@ -193,17 +194,28 @@ grep -rh "^tags:" src/articles/ | sort -u
 For topics exceeding 20 minutes:
 
 1. Set `trail: "Series Name"` and `trailOrder: N` in each part's frontmatter
-2. Set `trailDescription` on the first cairn — it appears on the trailhead trail card
-3. Optionally set `audience` tags for badge rendering on the trail landing page
-4. The article layout auto-renders prev/next navigation
+2. Set `trailDescription` on the first cairn — it appears on the trail home page, the `/trails/` directory card, and the trailhead "Latest Trails" card. (If the first cairn lacks a description, the system falls back to the first part that has one.)
+3. Set `audience` tags for badge rendering on the trail home page (the union of all parts' audiences shows on the trail header)
+4. The article layout auto-renders prev/next navigation, and the trail-name in the trail-nav header links back to the trail home page
 5. All parts share the same `trail` value
 6. Order is 1-based and sequential
+
+### Trail URLs and the trail home page
+
+Every trail gets its own deep-linkable home page at `/trails/{slug}/`, where `slug` is the trail name slugified (lowercase, non-word chars → `-`). For example:
+
+- `trail: "Foundations"` → `/trails/foundations/`
+- `trail: "Knowledge Hub"` → `/trails/knowledge-hub/`
+
+The trail home page shows the trail title, description, total parts and reading time, audience badges, a "Start the trail →" CTA pointing at part 1, and an ordered list of parts. The right sidebar lists contributors (union of `submitter` + `contributors` across parts) and the union of tags. The left sidebar lists every trail and highlights the current one.
+
+When you want a stable link to a trail (in another cairn, a chat thread, or a doc), link `/trails/{slug}/` — not the first cairn. That communicates "this is a series" rather than landing the reader inside part 1 with no idea what they're inside of.
 
 ## Trailhead
 
 The trailhead (homepage) shows:
-1. Featured Trails — cards with title, part count, reading time, description
-2. Featured Cairn — articles with `featured: true`, or most recent non-trail article
+1. Latest Trails — up to 3 trails sorted by most-recent-article date descending. Each card links to the trail home page (`/trails/{slug}/`). No manual rotation: publishing a new part of a trail automatically lifts that trail toward the top.
+2. Featured Cairn — the article with `featured: true`, or most recent non-trail article as fallback
 3. Recent cairns — last 5, excluding featured, with "Library →" link
 
 A dismissable welcome banner points new users to `/guide/`.
