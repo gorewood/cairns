@@ -428,6 +428,13 @@
   margin-top: 1.2rem;
   gap: 2px;
 }
+/* Restore the [hidden] attribute behavior — display: inline-flex above
+   would otherwise override the UA stylesheet's [hidden] { display: none }.
+   The toggle starts hidden and the article JS only reveals it when a
+   :::: tldr block is present in the source. */
+.view-toggle[hidden] {
+  display: none;
+}
 .view-toggle__btn {
   background: transparent;
   border: none;
