@@ -2,6 +2,18 @@
 
 The article body is standard markdown with `html: true` enabled. Use these extensions for rich content.
 
+## TL;DR Block
+
+Each cairn can ship with two views: Full and TL;DR. The TL;DR lives in a fenced container at the very top of the body, immediately after frontmatter. Use **four** colons for the outer fence so any inner `::: callout` blocks (three colons) nest cleanly:
+
+```markdown
+:::: tldr
+{condensed version of the article — same h2 structure, ~25-35% of the word count}
+::::
+```
+
+See `tldr-format.md` for the full authoring spec — when one is required, what to keep, what to drop, voice rules, and quality checks. A cairn without a `:::: tldr` block builds normally; the toggle is hidden until one is added.
+
 ## Callout Boxes
 
 Fenced container syntax via markdown-it-container:

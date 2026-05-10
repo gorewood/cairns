@@ -55,12 +55,27 @@
 
   var pendingSelection = null;
 
+  // Annotations are a Full-view feature. The TL;DR is for fast scanning;
+  // a reader who wants to leave a note should be in Full so the highlight
+  // anchors to the long-form text the issue reviewer will actually see.
+  // The tray + existing annotations stay functional in either view; only
+  // NEW selections are gated.
+  function isTldrView() {
+    return articleBody.getAttribute('data-view') === 'tldr';
+  }
+
   // ── Text selection handling — always active on article body ──
 
   document.addEventListener('mouseup', function (e) {
     // Don't interfere if user is interacting with the input box
     if (inputBox.classList.contains('visible')) return;
     if (toolbar.contains(e.target) || inputBox.contains(e.target) || tray.contains(e.target)) return;
+
+    // Skip selection handling in TL;DR view — annotations are Full-only.
+    if (isTldrView()) {
+      hideToolbar();
+      return;
+    }
 
     var sel = window.getSelection();
     if (!sel || sel.isCollapsed || !sel.toString().trim()) {
@@ -349,6 +364,7 @@
 
   // ── Click on highlight to edit ──
   document.addEventListener('click', function (e) {
+    if (isTldrView()) return;
     var mark = e.target.closest('mark.annotate-highlight');
     if (!mark || !mark.dataset.annotationIndex) return;
     var idx = parseInt(mark.dataset.annotationIndex, 10);

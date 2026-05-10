@@ -14,6 +14,23 @@ module.exports = function (eleventyConfig) {
     permalink: false,
   });
 
+  // :::: tldr — condensed view of the article. Rendered as a hidden div inside
+  // the article body and surfaced by the Full/TL;DR toggle. data-pagefind-ignore
+  // keeps it out of the search index so the TL;DR doesn't produce duplicate hits.
+  // Uses a four-colon outer fence so any inner ::: callout (three-colon) blocks
+  // nest cleanly — markdown-it-container matches by colon count.
+  md.use(markdownItContainer, "tldr", {
+    validate(params) {
+      return params.trim() === "tldr";
+    },
+    render(tokens, idx) {
+      if (tokens[idx].nesting === 1) {
+        return '<div class="cairn-tldr" hidden data-pagefind-ignore>\n';
+      }
+      return "</div>\n";
+    },
+  });
+
   // ::: callout key / tip / warn / def
   md.use(markdownItContainer, "callout", {
     validate(params) {

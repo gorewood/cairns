@@ -127,6 +127,14 @@ graph TD
 ````
 Theme-aware (adapts to light/dark mode). Do NOT use inline style directives on Mermaid nodes.
 
+**TL;DR block (optional secondary view):**
+````markdown
+:::: tldr
+{condensed version of the article — same h2 structure, ~25-35% of the word count}
+::::
+````
+Note the **four** colons on the outer fence — that lets any inner `::: callout` blocks (three colons) nest cleanly. Required for cairns with `duration: 12+` or any cairn in a trail; optional for shorter standalone cairns; discouraged for `duration: 7` or under. See `{baseDir}/references/tldr-format.md` for the full spec.
+
 See `{baseDir}/references/content-format.md` for full syntax reference.
 
 ### 4. Content Structure

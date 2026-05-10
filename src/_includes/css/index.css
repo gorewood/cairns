@@ -345,9 +345,26 @@
 }
 
 /* ── Right Sidebar ── */
+/* Sectioned vertical rhythm: each labeled block gets breathing room above
+   its label and stays tight to its content below. The first label hugs the
+   top of the sidebar; subsequent labels space themselves above the previous
+   block. Lists and meta-tables drop their browser-default top margin so the
+   gap below a label is just the label's own margin-bottom. */
+.sidebar-right .label {
+  margin-top: 1.5rem;
+}
+.sidebar-right > .label:first-child {
+  margin-top: 0;
+}
+.sidebar-right .meta-table,
+.sidebar-right .contrib-list,
+.sidebar-right .tag-pills {
+  margin-top: 0;
+}
 .contrib-list {
   list-style: none;
   margin-bottom: 2rem;
+  padding-left: 0;
 }
 .contrib-list li {
   font-size: 0.78rem;

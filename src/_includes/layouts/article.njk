@@ -37,14 +37,26 @@
     <!-- Main Article Column -->
     <article class="article-content">
       <header class="article-header">
-        <div class="article-header__eyebrow">Cairn &middot; {{ date | dateFormat }}</div>
+        <div class="article-header__eyebrow">
+          <span>Cairn &middot; {{ date | dateFormat }}</span>
+          {% if trail %}
+          <a href="{{ ('/trails/' + (trail | slugify) + '/') | url }}" class="article-header__trail-link"><span class="article-header__trail-link__arrow">&uarr;</span>{{ trail }}</a>
+          {% endif %}
+        </div>
         <h1 class="article-header__title">{{ title }}</h1>
-        <p class="article-header__subtitle">{{ subtitle }} &middot; ~{{ duration }} min read &middot; Suggested by {{ submitter }}
+        <p class="article-header__subtitle">{{ subtitle }} &middot;
+          <span class="reading-time" data-reading-time="full">~{{ duration }} min read</span>
+          <span class="reading-time" data-reading-time="tldr" hidden>~<span data-tldr-min>–</span> min read</span>
+          &middot; Suggested by {{ submitter }}
           {% if audience %}{% for aud in audience %}<span class="badge badge--audience">{{ aud }}</span>{% endfor %}{% endif %}
         </p>
         {% if lead %}
         <p class="article-header__lead">{{ lead | safe }}</p>
         {% endif %}
+        <div class="view-toggle" hidden role="group" aria-label="Article view" data-view-toggle>
+          <button type="button" class="view-toggle__btn" data-view-target="full" aria-pressed="true">Full <span class="view-toggle__time">~{{ duration }} min</span></button>
+          <button type="button" class="view-toggle__btn" data-view-target="tldr" aria-pressed="false">TL;DR <span class="view-toggle__time" data-tldr-time>~– min</span></button>
+        </div>
       </header>
 
       {% if prerequisites %}
@@ -61,11 +73,15 @@
       </div>
       {% endif %}
 
-      <div class="article-body" data-animate data-pagefind-body
+      <div class="article-body" data-animate data-view="full" data-pagefind-body
            data-pagefind-meta="title:{{ title }}"
            data-pagefind-filter="tag[data-tag]">
         {% for tag in tags %}{% if tag != "articles" %}<span data-tag data-pagefind-filter="tag" hidden>{{ tag }}</span>{% endif %}{% endfor %}
         {{ content | safe }}
+      </div>
+
+      <div class="tldr-banner" hidden data-tldr-banner>
+        You're reading the TL;DR. <a href="?view=full" data-switch-to="full">Read the full version &rarr;</a>
       </div>
 
       {% if trail %}
@@ -167,14 +183,13 @@
       if (h > 0) document.getElementById('progress').style.width = (window.scrollY / h) * 100 + '%';
     });
 
-    // Wrap h2-delimited content into <section> elements for TOC and animation
-    (function () {
-      const body = document.querySelector('.article-body');
-      if (!body) return;
-      const children = Array.from(body.childNodes);
-      let currentSection = null;
+    // Wrap h2-delimited content into <section> elements within a container so the
+    // Full and TL;DR views each get clean section grouping for TOC and animation.
+    function wrapH2Sections(container) {
+      if (!container) return;
+      const children = Array.from(container.childNodes);
       const fragment = document.createDocumentFragment();
-
+      let currentSection = null;
       children.forEach(node => {
         if (node.nodeType === 1 && node.tagName === 'H2') {
           currentSection = document.createElement('section');
@@ -187,46 +202,182 @@
           fragment.appendChild(node);
         }
       });
-      body.innerHTML = '';
-      body.appendChild(fragment);
-    })();
+      container.innerHTML = '';
+      container.appendChild(fragment);
+    }
 
-    // Auto-generate TOC from sections
-    const tocList = document.getElementById('toc-list');
-    const sections = document.querySelectorAll('.article-body section[id]');
-    sections.forEach(sec => {
-      const h = sec.querySelector('h2');
-      if (!h) return;
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = '#' + sec.id;
-      a.textContent = h.textContent;
-      a.dataset.section = sec.id;
-      li.appendChild(a);
-      tocList.appendChild(li);
-    });
+    const body = document.querySelector('.article-body');
+    const tldrBlock = body && body.querySelector('.cairn-tldr');
 
-    // Active TOC link on scroll
-    const tocLinks = tocList.querySelectorAll('a');
-    const observerToc = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          tocLinks.forEach(l => l.classList.remove('active'));
-          const match = tocList.querySelector('a[data-section="' + entry.target.id + '"]');
-          if (match) match.classList.add('active');
-        }
+    // If a TL;DR exists, lift it out so it's a sibling of (not nested in) the Full
+    // sections we're about to create. Both halves then get their own section list.
+    let tldrContent = null;
+    if (tldrBlock) {
+      // Reclaim canonical anchor IDs for the Full content. markdown-it-anchor
+      // numbers duplicate slugs in source order — TL;DR (top of source) takes
+      // the clean IDs and Full sections get "-1" suffixes. Swap so external
+      // links to the canonical slug land in Full (the default view), and the
+      // TL;DR sections get distinct "-tldr" IDs for their own TOC.
+      const tldrIds = new Set();
+      tldrBlock.querySelectorAll('[id]').forEach(el => tldrIds.add(el.id));
+      body.querySelectorAll('[id]').forEach(el => {
+        if (tldrBlock.contains(el)) return;
+        const m = el.id.match(/^(.*?)-(\d+)$/);
+        if (m && tldrIds.has(m[1])) el.id = m[1];
       });
-    }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
-    sections.forEach(s => observerToc.observe(s));
+      tldrBlock.querySelectorAll('[id]').forEach(el => { el.id = el.id + '-tldr'; });
 
-    // Section reveal animation (respects prefers-reduced-motion)
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const obs = new IntersectionObserver(entries => {
-        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-      }, { threshold: 0.06 });
-      sections.forEach(s => obs.observe(s));
+      tldrContent = document.createElement('div');
+      tldrContent.className = 'cairn-tldr cairn-tldr--lifted';
+      tldrContent.dataset.pagefindIgnore = 'true';
+      while (tldrBlock.firstChild) tldrContent.appendChild(tldrBlock.firstChild);
+      tldrBlock.remove();
+    }
+
+    wrapH2Sections(body);
+
+    if (tldrContent) {
+      wrapH2Sections(tldrContent);
+      body.insertBefore(tldrContent, body.firstChild);
+    }
+
+    // Auto-generate TOC from sections of the active view
+    const tocList = document.getElementById('toc-list');
+    function rebuildToc(view) {
+      tocList.innerHTML = '';
+      const scope = view === 'tldr' && tldrContent ? tldrContent : body;
+      const sects = scope.querySelectorAll(':scope > section[id]');
+      sects.forEach(sec => {
+        const h = sec.querySelector('h2');
+        if (!h) return;
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = '#' + sec.id;
+        a.textContent = h.textContent;
+        a.dataset.section = sec.id;
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+      attachTocObserver(sects);
+      return sects;
+    }
+
+    let tocObserver = null;
+    function attachTocObserver(sects) {
+      if (tocObserver) tocObserver.disconnect();
+      const tocLinks = tocList.querySelectorAll('a');
+      tocObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('active'));
+            const match = tocList.querySelector('a[data-section="' + entry.target.id + '"]');
+            if (match) match.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+      sects.forEach(s => tocObserver.observe(s));
+    }
+
+    // --- Full / TL;DR view machinery ---
+    const viewToggle = document.querySelector('[data-view-toggle]');
+    const tldrBanner = document.querySelector('[data-tldr-banner]');
+    const fullReadingTime = document.querySelector('[data-reading-time="full"]');
+    const tldrReadingTime = document.querySelector('[data-reading-time="tldr"]');
+    const tldrTimeChips = document.querySelectorAll('[data-tldr-time], [data-tldr-min]');
+
+    function computeReadingMinutes(el) {
+      if (!el) return 0;
+      // Exclude trailing reference / prompt / summary blocks (navigational,
+      // not part of the read), the lifted TL;DR (when computing Full), and
+      // any inline scripts/styles that might be in the cloned tree.
+      const clone = el.cloneNode(true);
+      clone.querySelectorAll('.cairn-tldr--lifted, .references, .discussion-prompts, .summary-list, script, style').forEach(n => n.remove());
+      const text = clone.textContent || '';
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      return Math.max(1, Math.round(words / 220));
+    }
+
+    let sectionObserver = null;
+    function attachSectionAnimation(sects) {
+      if (sectionObserver) sectionObserver.disconnect();
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        sectionObserver = new IntersectionObserver(entries => {
+          entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, { threshold: 0.06 });
+        sects.forEach(s => sectionObserver.observe(s));
+      } else {
+        sects.forEach(s => s.classList.add('visible'));
+      }
+    }
+
+    function applyView(view) {
+      const v = view === 'tldr' && tldrContent ? 'tldr' : 'full';
+      body.setAttribute('data-view', v);
+      if (viewToggle) {
+        viewToggle.querySelectorAll('.view-toggle__btn').forEach(btn => {
+          btn.setAttribute('aria-pressed', btn.dataset.viewTarget === v ? 'true' : 'false');
+        });
+      }
+      if (fullReadingTime) fullReadingTime.hidden = v !== 'full';
+      if (tldrReadingTime) tldrReadingTime.hidden = v !== 'tldr';
+      if (tldrBanner) tldrBanner.hidden = v !== 'tldr';
+      const sects = rebuildToc(v);
+      attachSectionAnimation(sects);
+      try { localStorage.setItem('cairns-view', v); } catch (e) {}
+      const url = new URL(window.location.href);
+      if (v === 'tldr') url.searchParams.set('view', 'tldr');
+      else url.searchParams.delete('view');
+      window.history.replaceState({}, '', url.toString());
+    }
+
+    // Compute and display the Full view's reading time client-side using
+    // the same heuristic as TL;DR. The frontmatter `duration` is the initial
+    // server-rendered value; this overrides it so the displayed time excludes
+    // the trailing references / prompts / summary blocks (interesting but
+    // navigational, not part of the read).
+    const fullMin = computeReadingMinutes(body);
+    if (fullReadingTime) fullReadingTime.textContent = '~' + fullMin + ' min read';
+    const fullToggleTime = viewToggle && viewToggle.querySelector('[data-view-target="full"] .view-toggle__time');
+    if (fullToggleTime) fullToggleTime.textContent = '~' + fullMin + ' min';
+
+    if (tldrContent) {
+      // Compute and display TL;DR reading time
+      const tldrMin = computeReadingMinutes(tldrContent);
+      tldrTimeChips.forEach(el => {
+        if (el.hasAttribute('data-tldr-time')) el.textContent = '~' + tldrMin + ' min';
+        if (el.hasAttribute('data-tldr-min')) el.textContent = tldrMin;
+      });
+      if (viewToggle) viewToggle.hidden = false;
+
+      // Wire toggle clicks
+      viewToggle.querySelectorAll('.view-toggle__btn').forEach(btn => {
+        btn.addEventListener('click', () => applyView(btn.dataset.viewTarget));
+      });
+
+      // Banner switch link
+      const bannerLink = tldrBanner && tldrBanner.querySelector('[data-switch-to]');
+      if (bannerLink) {
+        bannerLink.addEventListener('click', e => {
+          e.preventDefault();
+          applyView('full');
+        });
+      }
+
+      // Resolve initial view: URL param > localStorage > 'full'
+      const urlView = new URL(window.location.href).searchParams.get('view');
+      let initial = 'full';
+      if (urlView === 'tldr' || urlView === 'full') initial = urlView;
+      else {
+        try {
+          const stored = localStorage.getItem('cairns-view');
+          if (stored === 'tldr' || stored === 'full') initial = stored;
+        } catch (e) {}
+      }
+      applyView(initial);
     } else {
-      sections.forEach(s => s.classList.add('visible'));
+      // No TL;DR: just build TOC and animations from the Full body
+      const sects = rebuildToc('full');
+      attachSectionAnimation(sects);
     }
   </script>
   <noscript><style>.article-body[data-animate] section{opacity:1;transform:none;}</style></noscript>

@@ -71,6 +71,26 @@ done
 
 Orphans should get `related` links added, or be considered for a trail grouping.
 
+### TL;DR Coverage
+
+Cairns are expected to ship with a TL;DR view when `duration: 12` or higher, or when the cairn is part of a trail (consistency across a trail matters more than per-cairn savings). See `tldr-format.md` for the full heuristic.
+
+Find cairns that should have a TL;DR but don't:
+
+```bash
+for f in src/articles/**/*.md src/articles/*/*/*.md; do
+  [ -f "$f" ] || continue
+  has_tldr=$(grep -c '^:::: tldr$' "$f")
+  duration=$(grep -m1 '^duration:' "$f" | awk '{print $2}')
+  has_trail=$(grep -c '^trail:' "$f")
+  if [ "$has_tldr" = "0" ] && { [ "${duration:-0}" -ge 12 ] || [ "$has_trail" -gt 0 ]; }; then
+    echo "missing TL;DR: $f (duration=$duration, trail=$has_trail)"
+  fi
+done
+```
+
+The build's `prebuild` step (`npm run lint:tldr`) emits the same warnings non-blockingly. For each missing TL;DR, draft one per the spec (`tldr-format.md`) and insert at the top of the body. The toggle hides itself for cairns without a TL;DR, so missing ones do not break the page — they just leave the affordance unrealized.
+
 ### Trail Continuity
 
 For each trail, verify:

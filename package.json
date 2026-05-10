@@ -6,7 +6,9 @@
   "scripts": {
     "build": "npx @11ty/eleventy && npx pagefind --site _site && node scripts/version-pagefind-assets.js",
     "serve": "npx @11ty/eleventy --serve",
-    "clean": "rm -rf _site"
+    "clean": "rm -rf _site",
+    "lint:tldr": "node scripts/lint-tldr.js",
+    "prebuild": "node scripts/lint-tldr.js"
   },
   "keywords": [],
   "license": "MIT",
