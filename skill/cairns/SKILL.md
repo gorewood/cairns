@@ -23,6 +23,15 @@ You are the operator of this knowledge base. You research, write, publish, and m
 
 The goal: produce documentation that reads like it was written by a senior engineer who's been on the project for months. Be specific. Cite real patterns. Ground claims in actual code when possible.
 
+## Corpus Awareness — Two Files To Know
+
+Before drafting, cross-linking, or answering a question about what's already published, consult these two repo-root files. They are the agent-facing view of the corpus; readers use `/library/`, `/archives/`, `/trails/`, and tag pages instead.
+
+- **`INDEX.md`** — auto-generated catalog, one grep-friendly line per cairn (slug, date, duration, trail, tags, title, subtitle). Regenerated as part of `npm run prebuild`; you can also run `npm run build:index` directly. Read this first to find existing coverage, locate link targets, and avoid duplicating a topic.
+- **`LOG.md`** — append-only chronological record of every add, update, move, remove, and maintenance run. Format is documented in the file itself. **You append a line every time you change the corpus.** Use it to answer "when did we last touch X?" and to ground future decisions in recent history.
+
+When the user asks "do we already have a cairn on X?" or "what's been added recently?", reach for `INDEX.md` and `LOG.md` before re-reading articles.
+
 ## Repo Layout
 
 ```
@@ -178,6 +187,30 @@ git push
 ```
 
 CI auto-deploys on push to main. If you have a memory system, index the new cairn after publishing.
+
+### 7. Ripple Into Existing Cairns
+
+A new cairn is expected to *touch* existing cairns, not just sit beside them. After publishing, walk the corpus (read `INDEX.md`) and ask:
+
+- Does the new cairn argue for or against a claim in an older cairn? If yes, surface the connection — add `related` on both sides, or quote and link.
+- Did the new cairn introduce vocabulary that older cairns gestured at without naming? Backfill the term.
+- Did the new cairn supersede part of an older one? Mark the older one accordingly (a sidenote pointing forward is usually enough).
+
+A single new source can reasonably touch 3–10 existing cairns. If nothing else needs updating, double-check whether the cairn is really new, or whether you're restating something already covered.
+
+### 8. Append to LOG.md
+
+After publishing — and after every meaningful change to the corpus — append an entry to `LOG.md` at the repo root. See the file for the exact format. The agent and future you both rely on this record; do not skip it.
+
+## Q&A → Cairn
+
+When a teammate (or you) asks a substantive question against the corpus and the synthesized answer would teach the next reader, capture it as a cairn. Signs the answer is worth publishing:
+
+- It required reading three or more existing cairns plus external sources.
+- The reasoning would be tedious to reconstruct from scratch.
+- The same question is likely to come up again from a different person.
+
+For short answers that don't merit a full cairn, consider adding a brief note inside the most relevant existing cairn instead — and `LOG.md` it as an update. Explorations should compound, not evaporate.
 
 ## Content Guidelines
 

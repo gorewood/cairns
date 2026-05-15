@@ -2,14 +2,18 @@
 
 Run these periodically to keep the knowledge base healthy and well-connected.
 
+Every maintenance run should end with a single `## [YYYY-MM-DD] maint | <kind> | <note>` line appended to `LOG.md` at the repo root. Future runs grep this to know what's been checked recently.
+
 ## After Publishing
 
 After each new cairn is published:
 
-1. **Cross-link check** — Does the new cairn relate to existing cairns? Add `related` slugs to both the new and existing articles' frontmatter.
+1. **Cross-link check** — Does the new cairn relate to existing cairns? Add `related` slugs to both the new and existing articles' frontmatter. Treat this as expected ripple, not optional cleanup — a new cairn that touches nothing is suspicious.
 2. **Tag review** — Are the tags on the new cairn consistent with how those tags are used elsewhere? Check `grep -rh "^tags:" src/articles/`.
-3. **Memory index** — If you have a memory system, index the new cairn: title, subtitle, tags, key takeaways, permalink, and sources.
+3. **INDEX refresh** — The prebuild step regenerates `INDEX.md` automatically. If you skipped the build, run `npm run build:index` manually so the corpus catalog stays accurate.
 4. **Build verify** — Run `npm run build` and check that Pagefind indexes the new content.
+5. **Memory index** — If you have a memory system, index the new cairn: title, subtitle, tags, key takeaways, permalink, and sources.
+6. **Log entry** — Append an `add` (or `update`) line to `LOG.md`. Do this last so the log records work that built cleanly, not work that aborted at the build step.
 
 ## Weekly: Knowledge Base Health
 
@@ -90,6 +94,17 @@ done
 ```
 
 The build's `prebuild` step (`npm run lint:tldr`) emits the same warnings non-blockingly. For each missing TL;DR, draft one per the spec (`tldr-format.md`) and insert at the top of the body. The toggle hides itself for cairns without a TL;DR, so missing ones do not break the page — they just leave the affordance unrealized.
+
+### Contradiction Surfacing
+
+When two cairns make conflicting claims about the same fact, recommendation, or definition, surface the conflict rather than silently picking a winner:
+
+1. Quote both passages with their cairn slugs.
+2. Note the date of each so the reader can see which is older.
+3. If you know which is correct (e.g., one cites a now-out-of-date source), propose the fix — but let the human confirm before editing the surviving cairn.
+4. If you genuinely don't know, flag it for the next human review and stop.
+
+Contradictions are usually the most valuable thing a sweep finds: they're hidden by the per-article reading flow and only show up when something walks the whole corpus. Log them in `LOG.md` as `maint | contradictions | <note>` even when you don't fix them yet.
 
 ### Trail Continuity
 

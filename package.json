@@ -8,7 +8,8 @@
     "serve": "npx @11ty/eleventy --serve",
     "clean": "rm -rf _site",
     "lint:tldr": "node scripts/lint-tldr.js",
-    "prebuild": "node scripts/lint-tldr.js"
+    "build:index": "node scripts/build-index.js",
+    "prebuild": "node scripts/lint-tldr.js && node scripts/build-index.js"
   },
   "keywords": [],
   "license": "MIT",
